@@ -6,7 +6,12 @@ class Graph:
         self.vertices = []
 
     def add_vertex(self, x, y):
+        # TODO: this should be in CCW order
         self.vertices.append(Vertex(x, y))
+
+    def __getitem__(self, i):
+        # TODO: support slices that wrap around
+        return self.vertices[i % len(self.vertices)]
 
     def add_edge(self, v1, v2):
         pass  # TODO
