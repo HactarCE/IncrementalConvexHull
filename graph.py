@@ -51,7 +51,10 @@ class Graph:
         # TODO: Return an exception if cannot flip
         #   either because the edge is on the hull
         #   or because the quadrilateral is concave
-        pass  # TODO
+        n1 = v1.get_next_nbr(v2)
+        n2 = v2.get_next_nbr(v1)
+        self.remove_edge(v1, v2)
+        self.add_edge(n1, n2)
 
     def remove_vertex(self, v1: Vertex):
         # Remove v1 from associated neighbors
@@ -81,3 +84,12 @@ class Vertex:
     def remove_neighbor(self, v: Vertex):
         # TODO: We don't need to reorder, right?
         self.nbrs.remove(v)
+
+    def get_next_nbr(self, v) -> Vertex:
+        idx = self.nbrs.index(v)
+        if (idx == len(self.nbrs - 1)):
+            return self.nbrs[0]
+        return self.nbrs[idx + 1]
+
+    def __str__(self) -> str:
+        return str(self.loc)
