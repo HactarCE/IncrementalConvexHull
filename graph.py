@@ -14,11 +14,36 @@ class Graph:
         # TODO: this should be in CCW order
         self.vertices.append(Vertex(x, y))
 
-    def __getitem__(self, i):
-        # TODO: support slices that wrap around
-        return self.vertices[i % len(self.vertices)]
+    def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
+        """Retrieve the vertex (or slice of vertices) specified by the circular index i.
 
-    def add_edge(self, v1, v2):
+        Code inspired by https://stackoverflow.com/a/47606550/2977638
+        """
+        if isinstance(i, slice):
+            # Recursive call. But x is no longer a slice object, so the
+            # recursion bottoms out.
+            return [self[x] for x in self._rangeify(i)]
+
+        index = operator.index(i)
+        try:
+            return self.vertices[index % len(self.vertices)]
+        except ZeroDivisionError:
+            raise IndexError('list index out of range')
+
+    def _rangeify(self, slice):
+        start, stop, step = slice.start, slice.stop, slice.step
+        if start is None:
+            start = 0
+        if stop is None:
+            stop = len(self.vertices)
+        if step is None:
+            step = 1
+        return range(start, stop, step)
+
+    def index(self, v: Vertex):
+        return self.vertices.index(v)
+
+    def add_edge(self, v1: Vertex, v2: Vertex):
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
 
