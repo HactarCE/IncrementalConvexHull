@@ -1,9 +1,14 @@
+from __future__ import annotations
+
+import operator
+from typing import List, Sequence, Union
+
 import numpy as np
 
 
 class Graph:
     def __init__(self):
-        self.vertices = []
+        self.vertices: List[Vertex] = []
 
     def add_vertex(self, x, y):
         # TODO: this should be in CCW order
@@ -17,13 +22,13 @@ class Graph:
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
 
-    def flip_edge(self, v1, v2):
-        # Return an exception if cannot flip
+    def flip_edge(self, v1: Vertex, v2: Vertex):
+        # TODO: Return an exception if cannot flip
         #   either because the edge is on the hull
         #   or because the quadrilateral is concave
         pass  # TODO
 
-    def remove_vertex(self, v1):
+    def remove_vertex(self, v1: Vertex):
         # Remove v1 from associated neighbors
         for node in v1.nbrs:
             node.nbrs.remove(v1)
@@ -31,7 +36,7 @@ class Graph:
         # Remove v1 from graph
         self.vertices.remove(v1)
 
-    def remove_edge(self, v1, v2):
+    def remove_edge(self, v1: Vertex, v2: Vertex):
         # Remove V1 from V2 nbrs
         v1.remove_neighbor(v2)
 
@@ -42,12 +47,12 @@ class Graph:
 class Vertex:
     def __init__(self, x, y):
         self.loc = np.array([x, y])
-        self.nbrs = []
+        self.nbrs: List[Vertex] = []
 
-    def add_neighbor(self, v):
+    def add_neighbor(self, v: Vertex):
         # TODO: this should be in CCW order
         self.nbrs.append(v)
 
-    def remove_neighbor(self, v):
+    def remove_neighbor(self, v: Vertex):
         # TODO: We don't need to reorder, right?
         self.nbrs.remove(v)
