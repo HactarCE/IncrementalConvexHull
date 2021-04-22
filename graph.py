@@ -4,6 +4,8 @@ import operator
 from typing import List, Sequence, Union
 
 import numpy as np
+from itertools import permutations
+import point
 
 
 class Graph:
@@ -11,8 +13,9 @@ class Graph:
         self.vertices: List[Vertex] = []
 
     def add_vertex(self, x, y):
-        # TODO: this should be in CCW order
-        self.vertices.append(Vertex(x, y))
+        # Initialize vertex and insert neighbors
+        new_vertex = Vertex(x, y)
+        self.vertices.append(new_vertex)
 
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
         """Retrieve the vertex (or slice of vertices) specified by the circular index i.
@@ -78,11 +81,36 @@ class Vertex:
         self.nbrs: List[Vertex] = []
 
     def add_neighbor(self, v: Vertex):
-        # TODO: this should be in CCW order
-        self.nbrs.append(v)
+        size = len(self.nbrs)
+
+        # Case 1: List has less than 2 elements
+        if size == 0 or size == 1:
+            self.nbrs.append(v)
+
+        # Case 2: Search through nbrs to find correct location
+        else:
+            anchor = self.nbrs[0]  # Anchor point
+            compare = 1  # Index that will iterate thru nbrs, looking for orientation change
+
+            # Get starting orientations
+            prev_orient = point.orient(anchor, v, self.nbrs[compare])
+
+            while compare <= size:
+                # Reach end of nbrs with one orientation, append to end
+                if compare == size:
+                    self.nbrs.append(v)
+                    break
+                else:
+                    curr_orient = point.orient(anchor, v, self.nbrs[compare])
+                    if prev_orient == (-1 * curr_orient):
+                        insert = compare - 1
+                        self.nbrs.insert(insert, v)
+                        break
+                    else:
+                        prev_orient = curr_orient
+                        compare = compare + 1
 
     def remove_neighbor(self, v: Vertex):
-        # TODO: We don't need to reorder, right?
         self.nbrs.remove(v)
 
     def get_next_nbr(self, v) -> Vertex:
