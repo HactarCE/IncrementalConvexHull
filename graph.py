@@ -103,8 +103,7 @@ class Vertex:
                 else:
                     curr_orient = point.orient(anchor, v, self.nbrs[compare])
                     if prev_orient == (-1 * curr_orient):
-                        insert = compare - 1
-                        self.nbrs.insert(insert, v)
+                        self.nbrs.insert(compare, v)
                         break
                     else:
                         prev_orient = curr_orient
