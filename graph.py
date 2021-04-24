@@ -26,6 +26,12 @@ class Graph:
         # TODO: Remove vertices that are no longer in the graph
         self.vertices.append(new_vertex)
 
+    def hull_contains(self, x, y):
+        """Return whether an XY position is inside the convex hull of the
+        vertices of the graph.
+        """
+        pass
+
     def __len__(self) -> int:
         """Return the number of vertices in the graph."""
         return len(self.vertices)

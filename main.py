@@ -1,19 +1,29 @@
 from collections.abc import Iterable
-import pyglet
 import itertools
+import numpy as np
+import pyglet
 
-from graph import Graph
+from graph import Graph, Vertex
+from point import dist
 
 
 INSTRUCTIONS = """\
-Left click on an edge to flip it.
-Left click outside the graph to add a new vertex.
-Right click on a vertex to remove it.
+Click outside the graph to add a new vertex.
+Click near an edge to flip it.
+Click on a vertex to remove it.
 
 Animation multiplier: {animation_multiplier:.2f}
 [f] faster
 [s] slower
 """
+
+VERT_COLOR = (127, 127, 127)
+HOVERED_VERT_COLOR = (255, 0, 0)
+
+VERT_RADIUS = 3
+HOVERED_VERT_RADIUS = 4
+
+VERTEX_HOVER_RADIUS = 15
 
 
 def flatten(it):
@@ -28,20 +38,27 @@ def flatten(it):
             yield elem
 
 
-def point_gl_tri_coords(xy):
-    RADIUS = 2
+def gl_centered_rect_coords(xy, r):
     x, y = xy
-    x1, x2 = x - RADIUS, x + RADIUS
-    y1, y2 = y - RADIUS, y + RADIUS
+    x1, x2 = x - r, x + r
+    y1, y2 = y - r, y + r
     return [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]
+
+
+def edge_dist(endpoint1, endpoint2, point):
+    """Returns the distance from a point to a line segment.
+
+    Immplementation based on
+    https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Vector_formulation.
+    """
+    pass  # TODO
 
 
 def main():
     # Program state
     graph = Graph()
     animation_multiplier = 1
-    nearest_vertex = None
-    nearest_edge = None
+    nearest_thing = None
 
     # UI elements
     window = pyglet.window.Window()
@@ -71,12 +88,12 @@ def main():
         gl_indices = []
         for v in graph.vertices:
             l = len(vertex_coords)
-            gl_indices += [l + x for x in [0, 1, 2, 3, 2, 1]]
-            new_vertices = point_gl_tri_coords(v.loc)
+            radius = HOVERED_VERT_RADIUS if v is nearest_thing else VERT_RADIUS
+            color = HOVERED_VERT_COLOR if v is nearest_thing else VERT_COLOR
+            new_vertices = gl_centered_rect_coords(v.loc, radius)
             vertex_coords += new_vertices
-            vertex_colors += [(255, 0, 255)] * len(new_vertices)
-        gl_quads = [point_gl_tri_coords(v.loc) for v in graph.vertices]
-        gl_coords = list(itertools.chain(*gl_quads))
+            vertex_colors += [color] * len(new_vertices)
+            gl_indices += [l + x for x in [0, 1, 2, 3, 2, 1]]
         pyglet.graphics.draw_indexed(
             len(vertex_coords),
             pyglet.gl.GL_TRIANGLES,
@@ -95,13 +112,31 @@ def main():
 
     @window.event
     def on_mouse_motion(x, y, dx, dy):
-        pass
+        nonlocal nearest_thing
+
+        mouse = np.array([x, y])
+
+        nearest_vertex = None
+        if graph.vertices:
+            nearest_vertex = min(
+                graph.vertices,
+                key=lambda v: dist(mouse, v.loc),
+            )
+            if dist(mouse, nearest_vertex.loc) > VERTEX_HOVER_RADIUS:
+                nearest_vertex = None
+
+        nearest_edge = None  # TODO
+
+        nearest_thing = nearest_vertex or nearest_edge
 
     @window.event
     def on_mouse_press(x, y, button, modifiers):
         if button != pyglet.window.mouse.LEFT:
             return
-        graph.add_vertex(x, y)
+        if isinstance(nearest_thing, Vertex):
+            graph.remove_vertex(nearest_thing)
+        if nearest_thing is None:
+            graph.add_vertex(x, y)
 
     pyglet.app.run()
 
