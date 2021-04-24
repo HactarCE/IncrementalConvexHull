@@ -1,7 +1,8 @@
 from __future__ import annotations
+import itertools
 
 import operator
-from typing import List, Sequence, Union
+from typing import Iterable, List, Sequence, TypeVar, Union
 
 import numpy as np
 import point
@@ -32,7 +33,15 @@ class Graph:
         """Return whether an XY position is inside the convex hull of the
         vertices of the graph.
         """
-        pass
+        new_point = np.array([x, y])
+        desired_orient = None
+        for v1, v2 in pairwise(self.vertices):
+            this_orient = point.orient(v1.loc, v2.loc, new_point)
+            if desired_orient is None:
+                desired_orient = this_orient
+            if this_orient != desired_orient:
+                return False
+        return True
 
     def __len__(self) -> int:
         """Return the number of vertices in the graph."""
@@ -213,3 +222,12 @@ class Vertex:
 
     def __str__(self) -> str:
         return str(self.loc)
+
+
+T = TypeVar('T')
+
+
+def pairwise(iterable: Iterable[T]):
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
