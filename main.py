@@ -58,6 +58,7 @@ def main():
     # Program state
     graph = Graph()
     animation_multiplier = 1
+    mouse_pos = np.array([0, 0])
     nearest_thing = None
 
     # UI elements
@@ -71,6 +72,22 @@ def main():
         anchor_x='left',
         anchor_y='top',
     )
+
+    def update_nearest_thing():
+        nonlocal nearest_thing
+
+        nearest_vertex = None
+        if graph.vertices:
+            nearest_vertex = min(
+                graph.vertices,
+                key=lambda v: dist(mouse_pos, v.loc),
+            )
+            if dist(mouse_pos, nearest_vertex.loc) > VERTEX_HOVER_RADIUS:
+                nearest_vertex = None
+
+        nearest_edge = None  # TODO
+
+        nearest_thing = nearest_vertex or nearest_edge
 
     @window.event
     def on_draw():
@@ -112,22 +129,9 @@ def main():
 
     @window.event
     def on_mouse_motion(x, y, dx, dy):
-        nonlocal nearest_thing
-
-        mouse = np.array([x, y])
-
-        nearest_vertex = None
-        if graph.vertices:
-            nearest_vertex = min(
-                graph.vertices,
-                key=lambda v: dist(mouse, v.loc),
-            )
-            if dist(mouse, nearest_vertex.loc) > VERTEX_HOVER_RADIUS:
-                nearest_vertex = None
-
-        nearest_edge = None  # TODO
-
-        nearest_thing = nearest_vertex or nearest_edge
+        nonlocal mouse_pos
+        mouse_pos = np.array([x, y])
+        update_nearest_thing()
 
     @window.event
     def on_mouse_press(x, y, button, modifiers):
@@ -137,6 +141,7 @@ def main():
             graph.remove_vertex(nearest_thing)
         if nearest_thing is None:
             graph.add_vertex(x, y)
+        update_nearest_thing()
 
     pyglet.app.run()
 
