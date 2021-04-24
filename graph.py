@@ -1,7 +1,8 @@
 from __future__ import annotations
+import itertools
 
 import operator
-from typing import List, Sequence, Union
+from typing import Iterable, List, Sequence, TypeVar, Union
 
 import numpy as np
 import point
@@ -32,7 +33,15 @@ class Graph:
         """Return whether an XY position is inside the convex hull of the
         vertices of the graph.
         """
-        pass
+        new_point = np.array([x, y])
+        desired_orient = None
+        for v1, v2 in pairwise(self.vertices):
+            this_orient = point.orient(v1.loc, v2.loc, new_point)
+            if desired_orient is None:
+                desired_orient = this_orient
+            if this_orient != desired_orient:
+                return False
+        return True
 
     def __len__(self) -> int:
         """Return the number of vertices in the graph."""
@@ -130,17 +139,18 @@ class Graph:
         size = len(self.vertices)
 
         if size == 0 or 1:
-            raise ValueError("There must be a minimum of 2 points must be in the graph")
+            raise ValueError(
+                "There must be a minimum of 2 points must be in the graph")
         elif size == 2:
             return self.vertices[0], self.vertices[1]
         else:
             anchor = self.vertices[0]
-            prev_orient = point.orient(anchor, v, self.vertices[1])
+            prev_orient = point.orient(anchor.loc, v.loc, self.vertices[1].loc)
             idx = 2
             vertex1, vertex2 = None, None
 
             while idx < size:
-                curr_orient = point.orient(anchor, v, self.vertices[idx])
+                curr_orient = point.orient(anchor.loc, v.loc, self.vertices[idx].loc)
 
                 # Vertex 1 marks 1st change in orientation
                 if vertex1 is None and curr_orient == (prev_orient * -1):
@@ -182,7 +192,11 @@ class Vertex:
             compare = 1  # Index that will iterate thru nbrs, looking for orientation change
 
             # Get starting orientations
-            prev_orient = point.orient(anchor, v, self.nbrs[compare])
+            prev_orient = point.orient(
+                anchor.loc,
+                v.loc,
+                self.nbrs[compare].loc,
+            )
 
             while compare <= size:
                 # Reach end of nbrs with one orientation, append to end
@@ -190,7 +204,11 @@ class Vertex:
                     self.nbrs.append(v)
                     break
                 else:
-                    curr_orient = point.orient(anchor, v, self.nbrs[compare])
+                    curr_orient = point.orient(
+                        anchor.loc,
+                        v.loc,
+                        self.nbrs[compare].loc,
+                    )
                     if prev_orient == (-1 * curr_orient):
                         self.nbrs.insert(compare, v)
                         break
@@ -214,3 +232,12 @@ class Vertex:
 
     def __str__(self) -> str:
         return str(self.loc)
+
+
+T = TypeVar('T')
+
+
+def pairwise(iterable: Iterable[T]):
+    a, b = itertools.tee(iterable)
+    next(b, None)
+    return zip(a, b)
