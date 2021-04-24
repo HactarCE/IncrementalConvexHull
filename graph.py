@@ -27,28 +27,32 @@ class Graph:
         Similarly, any vertices currently on the hull that become interior vertices
         due to the addition of z are removed.
         """
-        # Don't do anything if the point to add is already within the convex hull.
-        if self.hull_contains(x, y):
-            return
-
         z = Vertex(x, y)
+        a, b = None, None
 
-        # From the perspective of z, the point a should be to its left, and b should
-        # be to its right
-        b, a = self.find_convex_nbrs(z)
-        ai = self.index(a)
-        bi = self.index(b)
+        if len(self) < 3:
+            # Don't do anything if the point to add is already within the convex hull.
+            if self.hull_contains(x, y):
+                return
 
-        flip_between(self, ai, bi)
+            # From the perspective of z, the point a should be to its left, and b should
+            # be to its right
+            b, a = self.find_convex_nbrs(z)
+            ai = self.index(a)
+            bi = self.index(b)
 
-        for v in self[ai+1:bi]:
-            self.remove_vertex(v)
+            flip_between(self, ai, bi)
+
+            for v in self[ai+1:bi]:
+                self.remove_vertex(v)
 
         # Keep vertices in ccw order
         self.vertices.insert(self.index(b))
 
-        self.add_edge(a, z)
-        self.add_edge(b, z)
+        if a is not None:
+            self.add_edge(a, z)
+            if b is not None and a is not b:
+                self.add_edge(b, z)
 
         return z
 
