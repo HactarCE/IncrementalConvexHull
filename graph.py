@@ -59,15 +59,9 @@ class Graph:
         if (len(self.vertices) < 3):
             return False
         new_point = np.array([x, y])
-        desired_orient = None
-        for v1, v2 in pairwise(self.vertices):
-            this_orient = point.orient(v1.loc, v2.loc, new_point)
-            if desired_orient is None:
-                desired_orient = this_orient
-            if this_orient != desired_orient:
+        for v1, v2 in self.vertex_pairs():
+            if point.orient(v1.loc, v2.loc, new_point) < 0:
                 return False
-        if desired_orient != point.orient(self.vertices[-1], self.vertices[0], new_point):
-            return False
         return True
 
     def __len__(self) -> int:
@@ -268,15 +262,6 @@ class Vertex:
 
     def __str__(self) -> str:
         return str(self.loc)
-
-
-T = TypeVar('T')
-
-
-def pairwise(iterable: Iterable[T]):
-    a, b = itertools.tee(iterable)
-    next(b, None)
-    return zip(a, b)
 
 
 def flip_between(g: Graph, ai: int, bi: int):
