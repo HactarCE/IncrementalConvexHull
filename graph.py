@@ -149,6 +149,7 @@ class Graph:
                     vertex2 = self.vertices[(idx - 1)]
 
                 idx += 1
+                prev_orient = curr_orient
 
                 if vertex1 is not None and vertex2 is not None:
                     return vertex1, vertex2
