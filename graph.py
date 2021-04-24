@@ -56,6 +56,8 @@ class Graph:
         """Return whether an XY position is inside the convex hull of the
         vertices of the graph.
         """
+        if (len(self.vertices) < 3):
+            return False
         new_point = np.array([x, y])
         desired_orient = None
         for v1, v2 in pairwise(self.vertices):
@@ -64,6 +66,8 @@ class Graph:
                 desired_orient = this_orient
             if this_orient != desired_orient:
                 return False
+        if desired_orient != point.orient(self.vertices[-1], self.vertices[0], new_point):
+            return False
         return True
 
     def __len__(self) -> int:
