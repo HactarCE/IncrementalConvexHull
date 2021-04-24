@@ -19,11 +19,17 @@ Animation multiplier: {animation_multiplier:.2f}
 
 VERT_COLOR = (127, 127, 127)
 HOVERED_VERT_COLOR = (255, 0, 0)
+EDGE_COLOR = (95, 95, 95)
+HOVERED_EDGE_COLOR = (63, 191, 63)
+
 
 VERT_RADIUS = 3
 HOVERED_VERT_RADIUS = 4
+EDGE_RADIUS = 1
+HOVERED_EDGE_RADIUS = 3
 
 VERTEX_HOVER_RADIUS = 15
+EDGE_HOVER_RADIUS = 15
 
 
 def flatten(it):
@@ -39,10 +45,29 @@ def flatten(it):
 
 
 def gl_centered_rect_coords(xy, r):
-    x, y = xy
+    x, y = xy.astype(np.float32)
     x1, x2 = x - r, x + r
     y1, y2 = y - r, y + r
     return [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]
+
+
+def gl_edge_coords(a, b, r):
+    fwd = (b - a).astype(np.float32)
+    fwd *= r / np.linalg.norm(fwd)
+    left = np.array([-fwd[1], fwd[0]])  # rotate `fwd` counterclockwise 90
+    right = -left
+    back = -fwd
+    return [
+        a + back + left,
+        a + back + right,
+        b + fwd + left,
+        b + fwd + right,
+    ]
+
+
+def gl_quad_indices(vertex_count):
+    for base in range(0, vertex_count, 4):
+        yield from [base + i for i in [0, 1, 2, 3, 2, 1]]
 
 
 def edge_dist(endpoint1, endpoint2, point):
@@ -99,23 +124,28 @@ def main():
         )
         instructions_label.draw()
 
-        # Draw vertices in the graph
         vertex_coords = []
         vertex_colors = []
-        gl_indices = []
+
+        # Draw edges in the graph (so that they appear "below" vertices)
+        for e in graph.edges():
+            (v1, v2) = e
+            radius = HOVERED_EDGE_RADIUS if e == nearest_thing else EDGE_RADIUS
+            color = HOVERED_EDGE_COLOR if e == nearest_thing else EDGE_COLOR
+            vertex_coords += gl_edge_coords(v1.loc, v2.loc, radius)
+            vertex_colors += [color] * 4
+
+        # Draw vertices in the graph
         for v in graph.vertices:
-            l = len(vertex_coords)
             radius = HOVERED_VERT_RADIUS if v is nearest_thing else VERT_RADIUS
             color = HOVERED_VERT_COLOR if v is nearest_thing else VERT_COLOR
-            new_vertices = gl_centered_rect_coords(v.loc, radius)
-            vertex_coords += new_vertices
-            vertex_colors += [color] * len(new_vertices)
-            gl_indices += [l + x for x in [0, 1, 2, 3, 2, 1]]
+            vertex_coords += gl_centered_rect_coords(v.loc, radius)
+            vertex_colors += [color] * 4
         pyglet.graphics.draw_indexed(
             len(vertex_coords),
             pyglet.gl.GL_TRIANGLES,
-            gl_indices,
-            ('v2i', list(flatten(vertex_coords))),
+            list(gl_quad_indices(len(vertex_coords))),
+            ('v2f', list(flatten(vertex_coords))),
             ('c3B', list(flatten(vertex_colors))),
         )
 
@@ -140,7 +170,9 @@ def main():
         if isinstance(nearest_thing, Vertex):
             graph.remove_vertex(nearest_thing)
         if nearest_thing is None:
-            graph.add_vertex(x, y)
+            v1 = graph.add_vertex(x, y)
+            for v2 in graph[:len(graph)-1]:
+                graph.add_edge(v1, v2)
         update_nearest_thing()
 
     pyglet.app.run()
