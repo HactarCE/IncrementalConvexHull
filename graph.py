@@ -136,6 +136,7 @@ class Graph:
         v2.remove_neighbor(v1)
 
     def find_convex_nbrs(self, v: Vertex):
+        """Find neighbors of the newly inserted point in the existing graph"""
         size = len(self.vertices)
 
         if size == 0 or 1:
