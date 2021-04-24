@@ -30,7 +30,10 @@ def add_hull_vertex(g: Graph, z: Vertex):
     Similarly, any vertices currently on the hull that become interior vertices
     due to the addition of z are removed.
     """
-    # TODO: Terminate early if z is already in or on the hull
+    # Don't do anything if the point to add is already within the convex hull.
+    if g.hull_contains(*z.loc):
+        return
+
     # TODO: Calculate a and b using our old homework algorithm
     # From the perspective of z, the point a should be to its left, and b should
     # be to its right
