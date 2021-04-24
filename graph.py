@@ -124,6 +124,9 @@ class Graph:
         # Remove V2 from V1 neighbors
         v2.remove_neighbor(v1)
 
+    def find_convex_nbrs(self):
+        pass
+
 
 class Vertex:
     """Vertex in an undirected graph of 2D Euclidean points.
