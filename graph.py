@@ -193,6 +193,13 @@ class Graph:
                 if vertex1 is not None and vertex2 is not None:
                     return vertex1, vertex2
 
+    def vertex_pairs(self):
+        """Return a generator over all pairs of adjacent points on the convex
+        shull.
+        """
+        for i in range(len(self)):
+            yield (self[i], self[i+1])
+
 
 class Vertex:
     """Vertex in an undirected graph of 2D Euclidean points.
