@@ -115,8 +115,32 @@ class Graph:
         # Remove V2 from V1 neighbors
         v2.remove_neighbor(v1)
 
-    def find_convex_nbrs(self):
-        pass
+    def find_convex_nbrs(self, v: Vertex):
+        size = len(self.vertices)
+
+        if size == 0 or 1:
+            raise ValueError("There must be a minimum of 2 points must be in the graph")
+        elif size == 2:
+            return self.vertices[0], self.vertices[1]
+        else:
+            anchor = self.vertices[0]
+            prev_orient = point.orient(anchor, v, self.vertices[1])
+            idx = 2
+            vertex1, vertex2 = None, None
+
+            while idx < size:
+                curr_orient = point.orient(anchor, v, self.vertices[idx])
+
+                # Vertex 1 marks 1st change in orientation
+                if vertex1 is None and curr_orient == (prev_orient * -1):
+                    vertex1 = self.vertices[(idx - 1)]
+                elif vertex2 is None and curr_orient == (prev_orient * -1):
+                    vertex2 = self.vertices[(idx - 1)]
+
+                idx += 1
+
+                if vertex1 is not None and vertex2 is not None:
+                    return vertex1, vertex2
 
 
 class Vertex:
@@ -160,7 +184,7 @@ class Vertex:
                         break
                     else:
                         prev_orient = curr_orient
-                        compare = compare + 1
+                        compare += 1
 
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
