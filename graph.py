@@ -26,6 +26,10 @@ class Graph:
         # TODO: Remove vertices that are no longer in the graph
         self.vertices.append(new_vertex)
 
+    def __len__(self) -> int:
+        """Return the number of vertices in the graph."""
+        return len(self.vertices)
+
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
         """Retrieve the vertex (or slice of vertices) specified by the circular
         index `i`.
@@ -40,7 +44,7 @@ class Graph:
 
         index = operator.index(i)
         try:
-            return self.vertices[index % len(self.vertices)]
+            return self.vertices[index % len(self)]
         except ZeroDivisionError:
             raise IndexError('list index out of range')
 
@@ -50,7 +54,7 @@ class Graph:
         if start is None:
             start = 0
         if stop is None:
-            stop = len(self.vertices)
+            stop = len(self)
         if step is None:
             step = 1
         return range(start, stop, step)
