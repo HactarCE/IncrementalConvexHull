@@ -9,10 +9,10 @@ import point
 
 
 class Graph:
-    """Undirected graph of 2D Euclidean points.
+    """Undirected convex graph of 2D Euclidean points.
 
-    Points are stored in an unordered list. Edges are stored using an adjacency
-    list on each vertex.
+    Points are stored in a list in counterclockwise sorted order. Edges are
+    stored using an adjacency list on each vertex.
     """
 
     def __init__(self):
@@ -23,6 +23,7 @@ class Graph:
         """Add a vertex at an XY position to the graph."""
         # Initialize vertex and insert neighbors
         new_vertex = Vertex(x, y)
+        # TODO: Remove vertices that are no longer in the graph
         self.vertices.append(new_vertex)
 
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
