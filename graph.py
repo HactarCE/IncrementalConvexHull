@@ -4,7 +4,6 @@ import operator
 from typing import List, Sequence, Union
 
 import numpy as np
-from itertools import permutations
 import point
 
 
