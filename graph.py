@@ -9,18 +9,28 @@ import point
 
 
 class Graph:
+    """Undirected graph of 2D Euclidean points.
+
+    Points are stored in an unordered list. Edges are stored using an adjacency
+    list on each vertex.
+    """
+
     def __init__(self):
+        """Construct a graph with no vertices."""
         self.vertices: List[Vertex] = []
 
     def add_vertex(self, x, y):
+        """Add a vertex at an XY position to the graph."""
         # Initialize vertex and insert neighbors
         new_vertex = Vertex(x, y)
         self.vertices.append(new_vertex)
 
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
-        """Retrieve the vertex (or slice of vertices) specified by the circular index i.
+        """Retrieve the vertex (or slice of vertices) specified by the circular
+        index `i`.
 
-        Code inspired by https://stackoverflow.com/a/47606550/2977638
+        Implementation partially based on
+        https://stackoverflow.com/a/47606550/2977638.
         """
         if isinstance(i, slice):
             # Recursive call. But x is no longer a slice object, so the
@@ -34,6 +44,7 @@ class Graph:
             raise IndexError('list index out of range')
 
     def _rangeify(self, slice):
+        """See https://stackoverflow.com/a/47606550/2977638."""
         start, stop, step = slice.start, slice.stop, slice.step
         if start is None:
             start = 0
@@ -44,13 +55,30 @@ class Graph:
         return range(start, stop, step)
 
     def index(self, v: Vertex):
+        """Return the index of the vertex"""
         return self.vertices.index(v)
 
     def add_edge(self, v1: Vertex, v2: Vertex):
+        """Add an edge between two vertices in the graph."""
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
 
     def flip_edge(self, v1: Vertex, v2: Vertex):
+        """Flip an edge between two vertices in graph.
+
+        An edge is flipped by creating a new edge crossing the other diagonal of
+        the quadrilateral formed by the triangles on either side of the original
+        edge.
+
+        Raises a `ValueError` if the edge cannot be flipped for any of the
+        following reasons:
+
+        - Either vertex is not in the graph.
+        - The edge is not in the graph.
+        - The edge is on the convex hull of the graph.
+        - The quadrilateral formed by the triangles on either side of the edge
+          is concave.
+        """
         # TODO: Return an exception if cannot flip
         #   either because the edge is on the hull
         #   or because the quadrilateral is concave
@@ -60,6 +88,7 @@ class Graph:
         self.add_edge(n1, n2)
 
     def remove_vertex(self, v1: Vertex):
+        """Remove a vertex and all its edges from the graph."""
         # Remove v1 from associated neighbors
         for node in v1.nbrs:
             node.nbrs.remove(v1)
@@ -68,6 +97,7 @@ class Graph:
         self.vertices.remove(v1)
 
     def remove_edge(self, v1: Vertex, v2: Vertex):
+        """Remove the edge between two vertictes from the graph."""
         # Remove V1 from V2 nbrs
         v1.remove_neighbor(v2)
 
@@ -76,15 +106,24 @@ class Graph:
 
 
 class Vertex:
+    """Vertex in an undirected graph of 2D Euclidean points.
+
+    Each vertex contains a list of neighboring vertices for which there is a
+    connecting edge. The list of vertices is sorted counterclockwise by angle,
+    however the starting index is arbitrary.
+    """
+
     def __init__(self, x, y):
+        """Create a vertex with an XY location and empty neighbors list."""
         self.loc = np.array([x, y])
         self.nbrs: List[Vertex] = []
 
     def add_neighbor(self, v: Vertex):
+        """Add another vertex as a neighbor to this one."""
         size = len(self.nbrs)
 
         # Case 1: List has less than 2 elements
-        if size == 0 or size == 1:
+        if size < 2:
             self.nbrs.append(v)
 
         # Case 2: Search through nbrs to find correct location
@@ -110,9 +149,14 @@ class Vertex:
                         compare = compare + 1
 
     def remove_neighbor(self, v: Vertex):
+        """Remove another vertex as a neighbor of this one.
+
+        This does NOT remove this vertex as a neighbor of the other one.
+        """
         self.nbrs.remove(v)
 
     def get_next_nbr(self, v) -> Vertex:
+        """Returns the next neighboring vertex in counterclockwise order."""
         idx = self.nbrs.index(v)
         if (idx == len(self.nbrs - 1)):
             return self.nbrs[0]
