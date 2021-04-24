@@ -130,17 +130,18 @@ class Graph:
         size = len(self.vertices)
 
         if size == 0 or 1:
-            raise ValueError("There must be a minimum of 2 points must be in the graph")
+            raise ValueError(
+                "There must be a minimum of 2 points must be in the graph")
         elif size == 2:
             return self.vertices[0], self.vertices[1]
         else:
             anchor = self.vertices[0]
-            prev_orient = point.orient(anchor, v, self.vertices[1])
+            prev_orient = point.orient(anchor.loc, v.loc, self.vertices[1].loc)
             idx = 2
             vertex1, vertex2 = None, None
 
             while idx < size:
-                curr_orient = point.orient(anchor, v, self.vertices[idx])
+                curr_orient = point.orient(anchor.loc, v.loc, self.vertices[idx].loc)
 
                 # Vertex 1 marks 1st change in orientation
                 if vertex1 is None and curr_orient == (prev_orient * -1):
@@ -181,7 +182,11 @@ class Vertex:
             compare = 1  # Index that will iterate thru nbrs, looking for orientation change
 
             # Get starting orientations
-            prev_orient = point.orient(anchor, v, self.nbrs[compare])
+            prev_orient = point.orient(
+                anchor.loc,
+                v.loc,
+                self.nbrs[compare].loc,
+            )
 
             while compare <= size:
                 # Reach end of nbrs with one orientation, append to end
@@ -189,7 +194,11 @@ class Vertex:
                     self.nbrs.append(v)
                     break
                 else:
-                    curr_orient = point.orient(anchor, v, self.nbrs[compare])
+                    curr_orient = point.orient(
+                        anchor.loc,
+                        v.loc,
+                        self.nbrs[compare].loc,
+                    )
                     if prev_orient == (-1 * curr_orient):
                         self.nbrs.insert(compare, v)
                         break
