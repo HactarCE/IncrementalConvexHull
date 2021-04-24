@@ -20,11 +20,14 @@ class Graph:
         self.vertices: List[Vertex] = []
 
     def add_vertex(self, x, y):
-        """Add a vertex at an XY position to the graph."""
+        """Add a vertex at an XY position to the graph and return the new
+        `Vertex`.
+        """
         # Initialize vertex and insert neighbors
         new_vertex = Vertex(x, y)
         # TODO: Remove vertices that are no longer in the graph
         self.vertices.append(new_vertex)
+        return new_vertex
 
     def hull_contains(self, x, y):
         """Return whether an XY position is inside the convex hull of the
@@ -73,6 +76,15 @@ class Graph:
         """Add an edge between two vertices in the graph."""
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
+
+    def edges(self):
+        """Return a generator over all edges in the graph."""
+        visited = set()
+        for v in self.vertices:
+            visited.add(v)
+            for nbr in v.nbrs:
+                if nbr not in visited:
+                    yield (v, nbr)
 
     def flip_edge(self, v1: Vertex, v2: Vertex):
         """Flip an edge between two vertices in graph.
