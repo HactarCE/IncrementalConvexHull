@@ -1,4 +1,5 @@
 from __future__ import annotations
+from algorithm import flip_between
 import itertools
 
 import operator
@@ -22,12 +23,35 @@ class Graph:
     def add_vertex(self, x, y):
         """Add a vertex at an XY position to the graph and return the new
         `Vertex`.
+
+        If the point is already on the interior of the convex hull, no action is taken.
+        Similarly, any vertices currently on the hull that become interior vertices
+        due to the addition of z are removed.
         """
-        # Initialize vertex and insert neighbors
-        new_vertex = Vertex(x, y)
-        # TODO: Remove vertices that are no longer in the graph
-        self.vertices.append(new_vertex)
-        return new_vertex
+        # Don't do anything if the point to add is already within the convex hull.
+        if self.hull_contains(x, y):
+            return
+
+        z = Vertex(x, y)
+
+        # From the perspective of z, the point a should be to its left, and b should
+        # be to its right
+        b, a = self.find_convex_nbrs(z)
+        ai = self.index(a)
+        bi = self.index(b)
+
+        flip_between(self, ai, bi)
+
+        for v in self[ai+1:bi]:
+            self.remove_vertex(v)
+
+        # Keep vertices in ccw order
+        self.vertices.insert(self.index(b))
+
+        self.add_edge(a, z)
+        self.add_edge(b, z)
+
+        return z
 
     def hull_contains(self, x, y):
         """Return whether an XY position is inside the convex hull of the
@@ -151,7 +175,8 @@ class Graph:
             vertex1, vertex2 = None, None
 
             while idx < size:
-                curr_orient = point.orient(anchor.loc, v.loc, self.vertices[idx].loc)
+                curr_orient = point.orient(
+                    anchor.loc, v.loc, self.vertices[idx].loc)
 
                 # Vertex 1 marks 1st change in orientation
                 if vertex1 is None and curr_orient == (prev_orient * -1):
