@@ -204,20 +204,20 @@ class Graph:
         """Transform the given graph's triangulation such that an edge between a and b exists.
         ai and bi are the indices of the vertices in graph g to connect.
         """
+        for c in self.get_cross_edges(ai, bi):
+            self.flip_edge(*c)
+
+    def get_cross_edges(self, ai, bi):
+        """Compute the edges in the graph that cross the line through the specified vertices."""
         # When looking "across" the hull from a to b, the vertices in the right
         # slice are on the right-hand side from the perspective of a.
         right_slice: Sequence[Vertex] = self[ai+1:bi]
         left_slice: Sequence[Vertex] = self[bi+1:ai]
 
-        cross_edges: List[Tuple[Vertex, Vertex]] = []
-
         for rv in right_slice:
             for lv in reversed(left_slice):
                 if rv.nbrs.contains(lv):
-                    cross_edges.append((rv, lv))
-
-        for c in cross_edges:
-            self.flip_edge(*c)
+                    yield (rv, lv)
 
 
 class Vertex:
