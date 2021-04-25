@@ -234,8 +234,9 @@ class Vertex:
     def nbr_pairs(self):
         """Return a generator over all pairs of adjacent points on the list of neighbors.
         """
-        for i in range(len(self.nbrs)):
-            yield (self[i], self[i+1])
+        n = len(self.nbrs)
+        for i in range(n):
+            yield (self.nbrs[i], self.nbrs[i+1 % n])
 
 
 def flip_between(g: Graph, ai: int, bi: int):
