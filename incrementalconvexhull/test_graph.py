@@ -10,7 +10,48 @@ class PolygonTest(unittest.TestCase):
         pass
 
     def test_find_convex_nbrs(self):
-        pass
+        # define points
+        a = graph.Vertex(-5, 0)
+        b = graph.Vertex(5, 0)
+        c = graph.Vertex(0, 5)
+        d = graph.Vertex(0, -1)
+
+        # no points; should raise an exception
+        g = graph.Graph()
+        self.assertRaises(
+            ValueError,
+            lambda: g.find_convex_nbrs(graph.Vertex(0, 5)),
+        )
+
+        # one point; should raise an exception
+        g.vertices.append(a)
+        self.assertRaises(
+            ValueError,
+            lambda: g.find_convex_nbrs(graph.Vertex(0, 5)),
+        )
+
+        # two points with test point below;
+        # should return the points in order
+        g.vertices.append(b)
+        assert (a, b) == g.find_convex_nbrs(graph.Vertex(0, -5))
+        # two points with test point above;
+        # should return the points in opposite order
+        # print(a, b)
+        # x, y = g.find_convex_nbrs(graph.Vertex(0, 5))
+        # print('really', x, y)
+        assert (b, a) == g.find_convex_nbrs(graph.Vertex(0, 5))
+
+        # add a third point above the first two
+        g.vertices.append(c)
+        # test interior
+        assert (None, None) == g.find_convex_nbrs(graph.Vertex(0, 2))
+        # test each possible edge
+        assert (a, b) == g.find_convex_nbrs(graph.Vertex(0, -5))
+        assert (b, c) == g.find_convex_nbrs(graph.Vertex(5, 5))
+        assert (c, a) == g.find_convex_nbrs(graph.Vertex(-5, 5))
+        assert (b, a) == g.find_convex_nbrs(graph.Vertex(0, 10))
+        assert (c, b) == g.find_convex_nbrs(graph.Vertex(-7, -1))
+        assert (a, c) == g.find_convex_nbrs(graph.Vertex(7, -1))
 
     def test_vertex_pairs(self):
         g = graph.Graph()
