@@ -1,8 +1,7 @@
 import unittest
-from graph import *
+from . import graph
 
 class PolygonTest(unittest.TestCase):
-
     def test_add_vertex(self):
         pass
 
