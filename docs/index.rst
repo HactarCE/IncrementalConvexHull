@@ -10,6 +10,7 @@ Welcome to Incremental Convex Hull's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   api
 
 
 Indices and tables
