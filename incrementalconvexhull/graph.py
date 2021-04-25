@@ -171,13 +171,24 @@ class Graph:
         elif size == 2:
             return self.vertices[0], self.vertices[1]
         else:
-            prev_orient, curr_orient = 0, 0
+            a, b = None, None
+            prev_orient = point.orient(self.vertices[-1].loc, self.vertices[0].loc, v.loc)
+
             for v1, v2 in self.vertex_pairs():
                 curr_orient = point.orient(v1.loc, v2.loc, v.loc)
-                if curr_orient == (prev_orient * -1):
-                    return v1, v2
-                else:
-                    prev_orient = curr_orient
+
+                # Set A before B
+                if prev_orient == -1 and curr_orient == 1:
+                    a = v1
+                if prev_orient == 1 and curr_orient == -1:
+                    b = v1
+
+                if a is not None and b is not None:
+                    return a, b
+
+                prev_orient = curr_orient
+
+        return None, None
 
     def vertex_pairs(self):
         """Return a generator over all pairs of adjacent points on the convex
