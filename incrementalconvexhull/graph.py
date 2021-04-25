@@ -170,7 +170,7 @@ class Graph:
         else:
             prev_orient, curr_orient = 0, 0
             for v1, v2 in self.vertex_pairs():
-                curr_orient = point.orient(v1, v2, v)
+                curr_orient = point.orient(v1.loc, v2.loc, v.loc)
                 if curr_orient == (prev_orient * -1):
                     return v1, v2
                 else:
@@ -207,7 +207,7 @@ class Vertex:
         # Case 2: Search through nbrs to find correct location
         prev_orient, curr_orient = 0, 0
         for v1, v2 in self.nbr_pairs():
-            curr_orient = point.orient(v1, v2, v)
+            curr_orient = point.orient(v1.loc, v2.loc, v.loc)
             if curr_orient == (prev_orient * -1):
                 idx = self.nbrs.index(v2) + 1
                 self.nbrs.insert(idx, v)
