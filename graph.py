@@ -30,7 +30,10 @@ class Graph:
         z = Vertex(x, y)
         a, b = None, None
 
-        if len(self) < 3:
+        if len(self) < 2:
+            # 2 or fewer vertices are always in ccw order
+            self.vertices.append(z)
+        else:
             # Don't do anything if the point to add is already within the convex hull.
             if self.hull_contains(x, y):
                 return
@@ -46,8 +49,8 @@ class Graph:
             for v in self[ai+1:bi]:
                 self.remove_vertex(v)
 
-        # Keep vertices in ccw order
-        self.vertices.insert(self.index(b))
+            # Keep vertices in ccw order
+            self.vertices.insert(self.index(b), z)
 
         if a is not None:
             self.add_edge(a, z)
@@ -164,9 +167,10 @@ class Graph:
         """Find neighbors of the newly inserted point in the existing graph"""
         size = len(self.vertices)
 
-        if size == 0 or 1:
+        if size < 2:
             raise ValueError(
-                "There must be a minimum of 2 points must be in the graph")
+                "There must be a minimum of 2 points must be in the graph"
+            )
         elif size == 2:
             return self.vertices[0], self.vertices[1]
         else:
