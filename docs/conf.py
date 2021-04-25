@@ -12,13 +12,9 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('..'))
+sys.path.insert(0, os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '..')))
 
-# Because we specify our own project as a requirement in requirements.txt, we
-# also import the project by name here so that Sphinx definitely has access on
-# all build platforms.
-
-import incrementalconvexhull
 
 # -- Project information -----------------------------------------------------
 
