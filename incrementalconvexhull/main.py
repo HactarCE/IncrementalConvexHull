@@ -165,15 +165,18 @@ def main():
         # - vertices
 
         # Draw ghost edges
-        try:
-            v1, v2 = graph.find_convex_nbrs(Vertex(*mouse_pos))
-            if v1 is not None and v2 is not None:
-                radius = GHOST_EDGE_RADIUS
-                color = GHOST_EDGE_COLOR
-                add_edge_to_draw_list(Vertex(*mouse_pos), v1, radius, color)
-                add_edge_to_draw_list(Vertex(*mouse_pos), v2, radius, color)
-        except ValueError:
-            pass  # ok if it fails
+        if nearest_thing is None:
+            try:
+                v1, v2 = graph.find_convex_nbrs(Vertex(*mouse_pos))
+                if v1 is not None and v2 is not None:
+                    radius = GHOST_EDGE_RADIUS
+                    color = GHOST_EDGE_COLOR
+                    add_edge_to_draw_list(
+                        Vertex(*mouse_pos), v1, radius, color)
+                    add_edge_to_draw_list(
+                        Vertex(*mouse_pos), v2, radius, color)
+            except ValueError:
+                pass  # ok if it fails
 
         # Draw edges in the graph
         for e in graph.edges():
