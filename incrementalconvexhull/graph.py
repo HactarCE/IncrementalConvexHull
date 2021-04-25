@@ -236,7 +236,7 @@ class Vertex:
         """
         n = len(self.nbrs)
         for i in range(n):
-            yield (self.nbrs[i], self.nbrs[i+1 % n])
+            yield (self.nbrs[i], self.nbrs[(i+1) % n])
 
 
 def flip_between(g: Graph, ai: int, bi: int):
