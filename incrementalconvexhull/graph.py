@@ -10,7 +10,6 @@ from . import point
 
 class Graph:
     """Undirected convex graph of 2D Euclidean points.
-
     Points are stored in a list in counterclockwise sorted order. Edges are
     stored using an adjacency list on each vertex.
     """
@@ -22,7 +21,6 @@ class Graph:
     def add_vertex(self, x, y):
         """Add a vertex at an XY position to the graph and return the new
         `Vertex`.
-
         If the point is already on the interior of the convex hull, no action is taken.
         Similarly, any vertices currently on the hull that become interior vertices
         due to the addition of z are removed.
@@ -78,7 +76,6 @@ class Graph:
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
         """Retrieve the vertex (or slice of vertices) specified by the circular
         index `i`.
-
         Implementation partially based on
         https://stackoverflow.com/a/47606550/2977638.
         """
@@ -124,14 +121,11 @@ class Graph:
 
     def flip_edge(self, v1: Vertex, v2: Vertex):
         """Flip an edge between two vertices in graph.
-
         An edge is flipped by creating a new edge crossing the other diagonal of
         the quadrilateral formed by the triangles on either side of the original
         edge.
-
         Raises a `ValueError` if the edge cannot be flipped for any of the
         following reasons:
-
         - Either vertex is not in the graph.
         - The edge is not in the graph.
         - The edge is on the convex hull of the graph.
@@ -193,7 +187,6 @@ class Graph:
 
 class Vertex:
     """Vertex in an undirected graph of 2D Euclidean points.
-
     Each vertex contains a list of neighboring vertices for which there is a
     connecting edge. The list of vertices is sorted counterclockwise by angle,
     however the starting index is arbitrary.
@@ -217,13 +210,14 @@ class Vertex:
         for v1, v2 in self.nbr_pairs():
             curr_orient = point.orient(v1, v2, v)
             if curr_orient == (prev_orient * -1):
-                return self.nbrs.index(v1)
+                idx = self.nbrs.index(v2) + 1
+                self.nbrs.insert(idx, v)
+                break
             else:
                 prev_orient = curr_orient
 
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
-
         This does NOT remove this vertex as a neighbor of the other one.
         """
         self.nbrs.remove(v)
@@ -247,7 +241,6 @@ class Vertex:
 
 def flip_between(g: Graph, ai: int, bi: int):
     """Transform the given graph's triangulation such that an edge between a and b exists.
-
     ai and bi are the indices of the vertices in graph g to connect.
     """
     # When looking "across" the hull from a to b, the vertices in the right
