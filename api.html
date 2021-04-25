@@ -34,6 +34,133 @@
   <div class="section" id="api-documentation">
 <h1>API Documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <p>Hi. I’m going to write about the code here.</p>
+<span class="target" id="module-incrementalconvexhull.graph"></span><dl class="class">
+<dt id="incrementalconvexhull.graph.Graph">
+<em class="property">class </em><code class="sig-prename descclassname">incrementalconvexhull.graph.</code><code class="sig-name descname">Graph</code><a class="headerlink" href="#incrementalconvexhull.graph.Graph" title="Permalink to this definition">¶</a></dt>
+<dd><p>Undirected convex graph of 2D Euclidean points.
+Points are stored in a list in counterclockwise sorted order. Edges are
+stored using an adjacency list on each vertex.</p>
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.add_edge">
+<code class="sig-name descname">add_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.add_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add an edge between two vertices in the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.add_vertex">
+<code class="sig-name descname">add_vertex</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.add_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a vertex at an XY position to the graph and return the new
+<cite>Vertex</cite>.
+If the point is already on the interior of the convex hull, no action is taken.
+Similarly, any vertices currently on the hull that become interior vertices
+due to the addition of z are removed.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.edges">
+<code class="sig-name descname">edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator over all edges in the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.find_convex_nbrs">
+<code class="sig-name descname">find_convex_nbrs</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.find_convex_nbrs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Find neighbors of the newly inserted point in the existing graph</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.flip_between">
+<code class="sig-name descname">flip_between</code><span class="sig-paren">(</span><em class="sig-param">ai: int</em>, <em class="sig-param">bi: int</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the given graph’s triangulation such that an edge between a and b exists.
+ai and bi are the indices of the vertices in graph g to connect.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.flip_edge">
+<code class="sig-name descname">flip_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Flip an edge between two vertices in graph.</p>
+<p>An edge is flipped by creating a new edge crossing the other diagonal of
+the quadrilateral formed by the triangles on either side of the original
+edge.</p>
+<p>Raises a <cite>ValueError</cite> if the edge cannot be flipped for any of the
+following reasons:</p>
+<ul class="simple">
+<li><p>Either vertex is not in the graph.</p></li>
+<li><p>The edge is not in the graph.</p></li>
+<li><p>The edge is on the convex hull of the graph.</p></li>
+<li><p>The quadrilateral formed by the triangles on either side of the edge
+is concave.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.hull_contains">
+<code class="sig-name descname">hull_contains</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.hull_contains" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether an XY position is inside the convex hull of the
+vertices of the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.index">
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the index of the vertex</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.remove_edge">
+<code class="sig-name descname">remove_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_edge" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove the edge between two vertictes from the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.remove_vertex">
+<code class="sig-name descname">remove_vertex</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove a vertex and all its edges from the graph.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.vertex_pairs">
+<code class="sig-name descname">vertex_pairs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.vertex_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator over all pairs of adjacent points on the convex
+hull.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="incrementalconvexhull.graph.Vertex">
+<em class="property">class </em><code class="sig-prename descclassname">incrementalconvexhull.graph.</code><code class="sig-name descname">Vertex</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex" title="Permalink to this definition">¶</a></dt>
+<dd><p>Vertex in an undirected graph of 2D Euclidean points.
+Each vertex contains a list of neighboring vertices for which there is a
+connecting edge. The list of vertices is sorted counterclockwise by angle,
+however the starting index is arbitrary.</p>
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Vertex.add_neighbor">
+<code class="sig-name descname">add_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.add_neighbor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add another vertex as a neighbor to this one.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Vertex.get_next_nbr">
+<code class="sig-name descname">get_next_nbr</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span> &#x2192; incrementalconvexhull.graph.Vertex<a class="headerlink" href="#incrementalconvexhull.graph.Vertex.get_next_nbr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns the next neighboring vertex in counterclockwise order.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Vertex.nbr_pairs">
+<code class="sig-name descname">nbr_pairs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.nbr_pairs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a generator over all pairs of adjacent points on the list of neighbors.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Vertex.remove_neighbor">
+<code class="sig-name descname">remove_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.remove_neighbor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Remove another vertex as a neighbor of this one.
+This does NOT remove this vertex as a neighbor of the other one.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
