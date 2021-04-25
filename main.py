@@ -20,16 +20,16 @@ Animation multiplier: {animation_multiplier:.2f}
 VERT_COLOR = (127, 127, 127)
 HOVERED_VERT_COLOR = (255, 0, 0)
 EDGE_COLOR = (95, 95, 95)
-HOVERED_EDGE_COLOR = (63, 191, 63)
+HOVERED_EDGE_COLOR = (63, 63, 255)
 
 
 VERT_RADIUS = 3.0
 HOVERED_VERT_RADIUS = 4.0
 EDGE_RADIUS = 1.0
-HOVERED_EDGE_RADIUS = 3.0
+HOVERED_EDGE_RADIUS = 2.0
 
 VERTEX_HOVER_RADIUS = 15.0
-EDGE_HOVER_RADIUS = 15.0
+EDGE_HOVER_RADIUS = 10.0
 
 
 def flatten(it):
@@ -80,7 +80,7 @@ def dist_point_to_line_segment(a, b, p):
     n = b - a
     line_length = np.linalg.norm(n)
     n /= line_length
-    v = a - p
+    v = p - a
     v_parallel = np.dot(v, n)
     if v_parallel < 0 or v_parallel > line_length:
         return None
@@ -122,10 +122,10 @@ def main():
                 nearest_vertex = None
 
         nearest_edge = None
-        nearest_edge_dist = None
+        nearest_edge_dist = EDGE_HOVER_RADIUS
         for (a, b) in graph.edges():
             edge_dist = dist_point_to_line_segment(a.loc, b.loc, mouse_pos)
-            if nearest_edge_dist is not None and edge_dist < nearest_edge_dist:
+            if edge_dist is not None and edge_dist < nearest_edge_dist:
                 nearest_edge = (a, b)
                 nearest_edge_dist = edge_dist
 
