@@ -38,7 +38,7 @@ class Graph:
 
             # From the perspective of z, the point a should be to its left, and b should
             # be to its right
-            # TODO: handle None (if z is on interior)
+            # TODO: handle None, None (if z is on interior)
             b, a = self.find_convex_nbrs(z)
             ai = self.index(a)
             bi = self.index(b)
