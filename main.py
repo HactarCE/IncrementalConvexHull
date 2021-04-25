@@ -96,7 +96,10 @@ def main():
     nearest_thing = None
 
     # UI elements
-    window = pyglet.window.Window()
+    window = pyglet.window.Window(
+        width=960,
+        height=720,
+    )
     instructions_label = pyglet.text.Label(
         "",
         x=10,
