@@ -39,7 +39,7 @@ class Graph:
             # From the perspective of z, the point a should be to its left, and b should
             # be to its right
             # TODO: handle None, None (if z is on interior)
-            b, a = self.find_convex_nbrs(z)
+            a, b = self.find_convex_nbrs(z)
             ai = self.index(a)
             bi = self.index(b)
 
@@ -171,15 +171,19 @@ class Graph:
             )
         else:
             a, b = None, None
-            prev_orient = point.orient(self.vertices[-1].loc, self.vertices[0].loc, v.loc)
+            prev_orient = point.orient(
+                self.vertices[-1].loc,
+                self.vertices[0].loc,
+                v.loc,
+            )
 
             for v1, v2 in self.vertex_pairs():
                 curr_orient = point.orient(v1.loc, v2.loc, v.loc)
 
                 # Set A before B
-                if prev_orient == -1 and curr_orient == 1:
-                    a = v1
                 if prev_orient == 1 and curr_orient == -1:
+                    a = v1
+                if prev_orient == -1 and curr_orient == 1:
                     b = v1
 
                 if a is not None and b is not None:
