@@ -23,13 +23,13 @@ EDGE_COLOR = (95, 95, 95)
 HOVERED_EDGE_COLOR = (63, 191, 63)
 
 
-VERT_RADIUS = 3
-HOVERED_VERT_RADIUS = 4
-EDGE_RADIUS = 1
-HOVERED_EDGE_RADIUS = 3
+VERT_RADIUS = 3.0
+HOVERED_VERT_RADIUS = 4.0
+EDGE_RADIUS = 1.0
+HOVERED_EDGE_RADIUS = 3.0
 
-VERTEX_HOVER_RADIUS = 15
-EDGE_HOVER_RADIUS = 15
+VERTEX_HOVER_RADIUS = 15.0
+EDGE_HOVER_RADIUS = 15.0
 
 
 def flatten(it):
@@ -45,15 +45,15 @@ def flatten(it):
 
 
 def gl_centered_rect_coords(xy, r):
-    x, y = xy.astype(np.float32)
+    x, y = xy
     x1, x2 = x - r, x + r
     y1, y2 = y - r, y + r
     return [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]
 
 
 def gl_edge_coords(a, b, r):
-    fwd = (b - a).astype(np.float32)
-    fwd *= r / np.linalg.norm(fwd)
+    fwd = b - a
+    fwd *= np.true_divide(r, np.linalg.norm(fwd))
     left = np.array([-fwd[1], fwd[0]])  # rotate `fwd` counterclockwise 90
     right = -left
     back = -fwd
@@ -70,20 +70,29 @@ def gl_quad_indices(vertex_count):
         yield from [base + i for i in [0, 1, 2, 3, 2, 1]]
 
 
-def edge_dist(endpoint1, endpoint2, point):
-    """Returns the distance from a point to a line segment.
+def dist_point_to_line_segment(a, b, p):
+    """Returns the distance from a point `p` to a line segment `(a, b)`, or
+    `None` if the point is beyond the bounds of the line segment.
 
     Immplementation based on
     https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line#Vector_formulation.
     """
-    pass  # TODO
+    n = b - a
+    line_length = np.linalg.norm(n)
+    n /= line_length
+    v = a - p
+    v_parallel = np.dot(v, n)
+    if v_parallel < 0 or v_parallel > line_length:
+        return None
+    v_perpendicular = v - n * v_parallel
+    return np.linalg.norm(v_perpendicular)
 
 
 def main():
     # Program state
     graph = Graph()
     animation_multiplier = 1
-    mouse_pos = np.array([0, 0])
+    mouse_pos = np.array([0.0, 0.0])
     nearest_thing = None
 
     # UI elements
@@ -98,8 +107,10 @@ def main():
         anchor_y='top',
     )
 
-    def update_nearest_thing():
-        nonlocal nearest_thing
+    def update_nearest_thing(x=None, y=None):
+        nonlocal mouse_pos, nearest_thing
+        if x is not None and y is not None:
+            mouse_pos = np.array([float(x), float(y)])
 
         nearest_vertex = None
         if graph.vertices:
@@ -110,7 +121,13 @@ def main():
             if dist(mouse_pos, nearest_vertex.loc) > VERTEX_HOVER_RADIUS:
                 nearest_vertex = None
 
-        nearest_edge = None  # TODO
+        nearest_edge = None
+        nearest_edge_dist = None
+        for (a, b) in graph.edges():
+            edge_dist = dist_point_to_line_segment(a.loc, b.loc, mouse_pos)
+            if nearest_edge_dist is not None and edge_dist < nearest_edge_dist:
+                nearest_edge = (a, b)
+                nearest_edge_dist = edge_dist
 
         nearest_thing = nearest_vertex or nearest_edge
 
@@ -159,9 +176,12 @@ def main():
 
     @window.event
     def on_mouse_motion(x, y, dx, dy):
+        update_nearest_thing(x, y)
+
+    @window.event
+    def on_mouse_drag(x, y, *args, **kwargs):
         nonlocal mouse_pos
-        mouse_pos = np.array([x, y])
-        update_nearest_thing()
+        update_nearest_thing(x, y)
 
     @window.event
     def on_mouse_press(x, y, button, modifiers):
@@ -170,7 +190,7 @@ def main():
         if isinstance(nearest_thing, Vertex):
             graph.remove_vertex(nearest_thing)
         if nearest_thing is None:
-            v1 = graph.add_vertex(x, y)
+            v1 = graph.add_vertex(*mouse_pos)
             for v2 in graph[:len(graph)-1]:
                 graph.add_edge(v1, v2)
         update_nearest_thing()
