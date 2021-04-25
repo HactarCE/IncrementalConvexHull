@@ -20,12 +20,14 @@ VERT_COLOR = (127, 127, 127)
 HOVERED_VERT_COLOR = (255, 0, 0)
 EDGE_COLOR = (95, 95, 95)
 HOVERED_EDGE_COLOR = (63, 63, 255)
+GHOST_EDGE_COLOR = (47, 47, 47)
 
 
 VERT_RADIUS = 3.0
 HOVERED_VERT_RADIUS = 4.0
 EDGE_RADIUS = 1.0
 HOVERED_EDGE_RADIUS = 2.0
+GHOST_EDGE_RADIUS = 1.0
 
 VERTEX_HOVER_RADIUS = 15.0
 EDGE_HOVER_RADIUS = 10.0
@@ -146,20 +148,48 @@ def main():
         vertex_coords = []
         vertex_colors = []
 
-        # Draw edges in the graph (so that they appear "below" vertices)
-        for e in graph.edges():
-            (v1, v2) = e
-            radius = HOVERED_EDGE_RADIUS if e == nearest_thing else EDGE_RADIUS
-            color = HOVERED_EDGE_COLOR if e == nearest_thing else EDGE_COLOR
+        def add_edge_to_draw_list(v1, v2, radius, color):
+            nonlocal vertex_coords, vertex_colors
             vertex_coords += gl_edge_coords(v1.loc, v2.loc, radius)
             vertex_colors += [color] * 4
 
-        # Draw vertices in the graph
-        for v in graph.vertices:
-            radius = HOVERED_VERT_RADIUS if v is nearest_thing else VERT_RADIUS
-            color = HOVERED_VERT_COLOR if v is nearest_thing else VERT_COLOR
+        def add_vertex_to_draw_list(v, radius, color):
+            nonlocal vertex_coords, vertex_colors
             vertex_coords += gl_centered_rect_coords(v.loc, radius)
             vertex_colors += [color] * 4
+
+        # Draw order (lowest to highest):
+        # - "ghost" edges
+        # - edges
+        # - vertices
+
+        # Draw ghost edges
+        try:
+            v1, v2 = graph.find_convex_nbrs(Vertex(*mouse_pos))
+            if v1 is not None and v2 is not None:
+                radius = GHOST_EDGE_RADIUS
+                color = GHOST_EDGE_COLOR
+                add_edge_to_draw_list(Vertex(*mouse_pos), v1, radius, color)
+                add_edge_to_draw_list(Vertex(*mouse_pos), v2, radius, color)
+        except ValueError:
+            pass  # ok if it fails
+
+        # Draw edges in the graph
+        for e in graph.edges():
+            add_edge_to_draw_list(
+                *e,
+                radius=HOVERED_EDGE_RADIUS if e == nearest_thing else EDGE_RADIUS,
+                color=HOVERED_EDGE_COLOR if e == nearest_thing else EDGE_COLOR,
+            )
+
+        # Draw vertices in the graph
+        for v in graph.vertices:
+            add_vertex_to_draw_list(
+                v,
+                radius=HOVERED_VERT_RADIUS if v is nearest_thing else VERT_RADIUS,
+                color=HOVERED_VERT_COLOR if v is nearest_thing else VERT_COLOR,
+            )
+
         pyglet.graphics.draw_indexed(
             len(vertex_coords),
             pyglet.gl.GL_TRIANGLES,
