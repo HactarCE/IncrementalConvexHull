@@ -1,11 +1,11 @@
 from __future__ import annotations
-import itertools
 
 import operator
-from typing import Iterable, List, Sequence, Tuple, TypeVar, Union
+from typing import List, Sequence, Tuple, Union
 
 import numpy as np
-import point
+
+from . import point
 
 
 class Graph:

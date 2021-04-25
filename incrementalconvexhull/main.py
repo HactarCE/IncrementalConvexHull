@@ -1,11 +1,10 @@
 from collections.abc import Iterable
-import itertools
+
 import numpy as np
 import pyglet
 
-from graph import Graph, Vertex
-from point import dist
-
+from .graph import Graph, Vertex
+from .point import dist
 
 INSTRUCTIONS = """\
 Click outside the graph to add a new vertex.
