@@ -192,6 +192,7 @@ def main():
         if isinstance(nearest_thing, Vertex):
             graph.remove_vertex(nearest_thing)
         if nearest_thing is None:
+            # TODO: handle None (if z is on interior)
             v1 = graph.add_vertex(*mouse_pos)
             for v2 in graph[:len(graph)-1]:
                 graph.add_edge(v1, v2)
