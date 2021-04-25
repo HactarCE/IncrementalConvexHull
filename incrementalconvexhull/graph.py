@@ -182,10 +182,9 @@ class Graph:
                 else:
                     prev_orient = curr_orient
 
-
     def vertex_pairs(self):
         """Return a generator over all pairs of adjacent points on the convex
-        shull.
+        hull.
         """
         for i in range(len(self)):
             yield (self[i], self[i+1])
