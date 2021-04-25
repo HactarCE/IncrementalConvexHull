@@ -100,6 +100,7 @@ def main():
     window = pyglet.window.Window(
         width=960,
         height=720,
+        config=pyglet.gl.Config(sample_buffers=1, samples=4),
     )
     instructions_label = pyglet.text.Label(
         "",
