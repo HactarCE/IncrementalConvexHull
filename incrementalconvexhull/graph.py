@@ -174,26 +174,14 @@ class Graph:
         elif size == 2:
             return self.vertices[0], self.vertices[1]
         else:
-            anchor = self.vertices[0]
-            prev_orient = point.orient(anchor.loc, v.loc, self.vertices[1].loc)
-            idx = 2
-            vertex1, vertex2 = None, None
+            prev_orient, curr_orient = 0, 0
+            for v1, v2 in self.vertex_pairs():
+                curr_orient = point.orient(v1, v2, v)
+                if curr_orient == (prev_orient * -1):
+                    return v1, v2
+                else:
+                    prev_orient = curr_orient
 
-            while idx < size:
-                curr_orient = point.orient(
-                    anchor.loc, v.loc, self.vertices[idx].loc)
-
-                # Vertex 1 marks 1st change in orientation
-                if vertex1 is None and curr_orient == (prev_orient * -1):
-                    vertex1 = self.vertices[(idx - 1)]
-                elif vertex2 is None and curr_orient == (prev_orient * -1):
-                    vertex2 = self.vertices[(idx - 1)]
-
-                idx += 1
-                prev_orient = curr_orient
-
-                if vertex1 is not None and vertex2 is not None:
-                    return vertex1, vertex2
 
     def vertex_pairs(self):
         """Return a generator over all pairs of adjacent points on the convex
@@ -225,34 +213,13 @@ class Vertex:
             self.nbrs.append(v)
 
         # Case 2: Search through nbrs to find correct location
-        else:
-            anchor = self.nbrs[0]  # Anchor point
-            compare = 1  # Index that will iterate thru nbrs, looking for orientation change
-
-            # Get starting orientations
-            prev_orient = point.orient(
-                anchor.loc,
-                v.loc,
-                self.nbrs[compare].loc,
-            )
-
-            while compare <= size:
-                # Reach end of nbrs with one orientation, append to end
-                if compare == size:
-                    self.nbrs.append(v)
-                    break
-                else:
-                    curr_orient = point.orient(
-                        anchor.loc,
-                        v.loc,
-                        self.nbrs[compare].loc,
-                    )
-                    if prev_orient == (-1 * curr_orient):
-                        self.nbrs.insert(compare, v)
-                        break
-                    else:
-                        prev_orient = curr_orient
-                        compare += 1
+        prev_orient, curr_orient = 0, 0
+        for v1, v2 in self.nbr_pairs():
+            curr_orient = point.orient(v1, v2, v)
+            if curr_orient == (prev_orient * -1):
+                return self.nbrs.index(v1)
+            else:
+                prev_orient = curr_orient
 
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
@@ -270,6 +237,12 @@ class Vertex:
 
     def __str__(self) -> str:
         return str(self.loc)
+
+    def nbr_pairs(self):
+        """Return a generator over all pairs of adjacent points on the list of neighbors.
+        """
+        for i in range(len(self.nbrs)):
+            yield (self[i], self[i+1])
 
 
 def flip_between(g: Graph, ai: int, bi: int):
