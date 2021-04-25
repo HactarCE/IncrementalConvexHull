@@ -169,8 +169,6 @@ class Graph:
             raise ValueError(
                 "There must be a minimum of 2 points must be in the graph"
             )
-        elif size == 2:
-            return self.vertices[0], self.vertices[1]
         else:
             a, b = None, None
             prev_orient = point.orient(self.vertices[-1].loc, self.vertices[0].loc, v.loc)
