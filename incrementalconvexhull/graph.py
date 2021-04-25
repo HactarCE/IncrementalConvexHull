@@ -121,11 +121,14 @@ class Graph:
 
     def flip_edge(self, v1: Vertex, v2: Vertex):
         """Flip an edge between two vertices in graph.
+
         An edge is flipped by creating a new edge crossing the other diagonal of
         the quadrilateral formed by the triangles on either side of the original
         edge.
+
         Raises a `ValueError` if the edge cannot be flipped for any of the
         following reasons:
+
         - Either vertex is not in the graph.
         - The edge is not in the graph.
         - The edge is on the convex hull of the graph.
