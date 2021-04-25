@@ -32,7 +32,8 @@ extensions = [
     'sphinx.ext.autodoc'
 ]
 
-autodoc_typehints = 'description'
+autodoc_typehints = 'none'
+autodoc_mock_imports = ['numpy', 'pyglet']
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
