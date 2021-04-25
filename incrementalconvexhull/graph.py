@@ -40,11 +40,11 @@ class Graph:
             # be to its right
             # TODO: handle None, None (if z is on interior)
             a, b = self.find_convex_nbrs(z)
+
+            self.flip_between(a, b)
+
             ai = self.index(a)
             bi = self.index(b)
-
-            self.flip_between(ai, bi)
-
             for v in self[ai+1:bi]:
                 self.remove_vertex(v)
 
@@ -200,17 +200,17 @@ class Graph:
         for i in range(len(self)):
             yield (self[i], self[i+1])
 
-    def flip_between(self, ai: int, bi: int):
-        """Transform the given graph's triangulation such that an edge between a and b exists.
-        ai and bi are the indices of the vertices in graph g to connect.
-        """
-        for c in self.get_cross_edges(ai, bi):
+    def flip_between(self, a: Vertex, b: Vertex):
+        """Transform the given graph's triangulation such that an edge between a and b exists."""
+        for c in self.get_cross_edges(a, b):
             self.flip_edge(*c)
 
-    def get_cross_edges(self, ai, bi):
+    def get_cross_edges(self, a: Vertex, b: Vertex):
         """Compute the edges in the graph that cross the line through the specified vertices."""
         # When looking "across" the hull from a to b, the vertices in the right
         # slice are on the right-hand side from the perspective of a.
+        ai = self.index(a)
+        bi = self.index(b)
         right_slice: Sequence[Vertex] = self[ai+1:bi]
         left_slice: Sequence[Vertex] = self[bi+1:ai]
 
