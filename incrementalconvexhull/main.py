@@ -94,7 +94,7 @@ def main():
     graph = Graph()
     animation_multiplier = 1
     mouse_pos = np.array([0.0, 0.0])
-    nearest_thing = None
+    hover_target = None
 
     # UI elements
     window = pyglet.window.Window(
@@ -113,7 +113,7 @@ def main():
     )
 
     def update_nearest_thing(x=None, y=None):
-        nonlocal mouse_pos, nearest_thing
+        nonlocal mouse_pos, hover_target
         if x is not None and y is not None:
             mouse_pos = np.array([float(x), float(y)])
 
@@ -134,7 +134,7 @@ def main():
                 nearest_edge = (a, b)
                 nearest_edge_dist = edge_dist
 
-        nearest_thing = nearest_vertex or nearest_edge
+        hover_target = nearest_vertex or nearest_edge
 
     @window.event
     def on_draw():
@@ -165,7 +165,7 @@ def main():
         # - vertices
 
         # Draw ghost edges
-        if nearest_thing is None:
+        if hover_target is None:
             try:
                 v1, v2 = graph.find_convex_nbrs(Vertex(*mouse_pos))
                 if v1 is not None and v2 is not None:
@@ -182,16 +182,16 @@ def main():
         for e in graph.edges():
             add_edge_to_draw_list(
                 *e,
-                radius=HOVERED_EDGE_RADIUS if e == nearest_thing else EDGE_RADIUS,
-                color=HOVERED_EDGE_COLOR if e == nearest_thing else EDGE_COLOR,
+                radius=HOVERED_EDGE_RADIUS if e == hover_target else EDGE_RADIUS,
+                color=HOVERED_EDGE_COLOR if e == hover_target else EDGE_COLOR,
             )
 
         # Draw vertices in the graph
         for v in graph.vertices:
             add_vertex_to_draw_list(
                 v,
-                radius=HOVERED_VERT_RADIUS if v is nearest_thing else VERT_RADIUS,
-                color=HOVERED_VERT_COLOR if v is nearest_thing else VERT_COLOR,
+                radius=HOVERED_VERT_RADIUS if v is hover_target else VERT_RADIUS,
+                color=HOVERED_VERT_COLOR if v is hover_target else VERT_COLOR,
             )
 
         pyglet.graphics.draw_indexed(
@@ -223,9 +223,9 @@ def main():
     def on_mouse_press(x, y, button, modifiers):
         if button != pyglet.window.mouse.LEFT:
             return
-        if isinstance(nearest_thing, Vertex):
-            graph.remove_vertex(nearest_thing)
-        if nearest_thing is None:
+        if isinstance(hover_target, Vertex):
+            graph.remove_vertex(hover_target)
+        if hover_target is None:
             # TODO: handle None, None (if z is on interior)
             v1 = graph.add_vertex(*mouse_pos)
             for v2 in graph[:len(graph)-1]:
