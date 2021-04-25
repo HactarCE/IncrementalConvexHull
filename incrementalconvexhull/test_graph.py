@@ -80,6 +80,13 @@ class PolygonTest(unittest.TestCase):
         v2 = g.add_vertex(1, 0)
         v3 = g.add_vertex(1, 1)
         should_return = [(v0, v2), (v2, v3), (v3, v1), (v1, v0)]
+        last_index = -1
+        count = 0
         for pair in g.vertex_pairs():
-            should_return.remove(pair)
-        self.assertEqual(0, len(should_return))
+            count += 1
+            this_index = should_return.index(pair)
+            if last_index != -1:
+                self.assertEqual((last_index + 1) %
+                                 len(should_return), this_index)
+            last_index = this_index
+        self.assertEqual(count, len(should_return))
