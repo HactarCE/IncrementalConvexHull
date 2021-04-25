@@ -42,7 +42,7 @@ Points are stored in a list in counterclockwise sorted order. Edges are
 stored using an adjacency list on each vertex.</p>
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.add_edge">
-<code class="sig-name descname">add_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.add_edge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_edge</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.add_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an edge between two vertices in the graph.</p>
 </dd></dl>
 
@@ -64,20 +64,20 @@ due to the addition of z are removed.</p>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.find_convex_nbrs">
-<code class="sig-name descname">find_convex_nbrs</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.find_convex_nbrs" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">find_convex_nbrs</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.find_convex_nbrs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find neighbors of the newly inserted point in the existing graph</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.flip_between">
-<code class="sig-name descname">flip_between</code><span class="sig-paren">(</span><em class="sig-param">ai: int</em>, <em class="sig-param">bi: int</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_between" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flip_between</code><span class="sig-paren">(</span><em class="sig-param">ai</em>, <em class="sig-param">bi</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_between" title="Permalink to this definition">¶</a></dt>
 <dd><p>Transform the given graph’s triangulation such that an edge between a and b exists.
 ai and bi are the indices of the vertices in graph g to connect.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.flip_edge">
-<code class="sig-name descname">flip_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_edge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">flip_edge</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Flip an edge between two vertices in graph.</p>
 <p>An edge is flipped by creating a new edge crossing the other diagonal of
 the quadrilateral formed by the triangles on either side of the original
@@ -102,19 +102,19 @@ vertices of the graph.</p>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.index">
-<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.index" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the index of the vertex</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.remove_edge">
-<code class="sig-name descname">remove_edge</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em>, <em class="sig-param">v2: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_edge" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_edge</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the edge between two vertictes from the graph.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.remove_vertex">
-<code class="sig-name descname">remove_vertex</code><span class="sig-paren">(</span><em class="sig-param">v1: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_vertex" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_vertex</code><span class="sig-paren">(</span><em class="sig-param">v1</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a vertex and all its edges from the graph.</p>
 </dd></dl>
 
@@ -136,13 +136,13 @@ connecting edge. The list of vertices is sorted counterclockwise by angle,
 however the starting index is arbitrary.</p>
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Vertex.add_neighbor">
-<code class="sig-name descname">add_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.add_neighbor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">add_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.add_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add another vertex as a neighbor to this one.</p>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Vertex.get_next_nbr">
-<code class="sig-name descname">get_next_nbr</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span> &#x2192; incrementalconvexhull.graph.Vertex<a class="headerlink" href="#incrementalconvexhull.graph.Vertex.get_next_nbr" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">get_next_nbr</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.get_next_nbr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next neighboring vertex in counterclockwise order.</p>
 </dd></dl>
 
@@ -154,7 +154,7 @@ however the starting index is arbitrary.</p>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Vertex.remove_neighbor">
-<code class="sig-name descname">remove_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v: incrementalconvexhull.graph.Vertex</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.remove_neighbor" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">remove_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.remove_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove another vertex as a neighbor of this one.
 This does NOT remove this vertex as a neighbor of the other one.</p>
 </dd></dl>
