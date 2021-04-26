@@ -1,5 +1,6 @@
 from collections.abc import Iterable
 import math
+import random
 import textwrap
 
 import numpy as np
@@ -12,6 +13,7 @@ from .point import dist
 FPS = 60
 DEFAULT_ANIMATION_DURATION = 1.0
 
+RANDOMIZE = True
 
 VERT_COLOR = (127, 127, 127)
 HOVERED_VERT_COLOR = (255, 0, 0)
@@ -93,6 +95,8 @@ class VisualizationWindow(pyglet.window.Window):
                 v = self.hover_target
                 self.queued_flip_animations += [(v, n) for n in v.nbrs
                                                 if self.graph.can_flip(v, n)]
+                if RANDOMIZE:
+                    random.shuffle(self.queued_flip_animations)
                 self.queued_vertex_to_remove = v
             except ValueError:
                 self.graph.remove_vertex(*self.mouse_pos)
@@ -100,6 +104,8 @@ class VisualizationWindow(pyglet.window.Window):
             try:
                 a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
                 self.queued_flip_animations += self.graph.get_cross_edges(a, b)
+                if RANDOMIZE:
+                    random.shuffle(self.queued_flip_animations)
                 self.queued_vertex_to_add = self.mouse_pos
             except ValueError:
                 self.graph.add_vertex(*self.mouse_pos)
