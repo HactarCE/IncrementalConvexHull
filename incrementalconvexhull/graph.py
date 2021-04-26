@@ -133,8 +133,10 @@ class Graph:
         - Either vertex is not in the graph.
         - The edge is not in the graph.
         - The edge is on the convex hull of the graph.
-        - The quadrilateral formed by the triangles on either side of the edge
-          is concave.
+
+        Note that the quadrilateral formed by the triangles on either side of
+        the edge is never concave because the vertices of the graph form a
+        convex polygon.
         """
         # TODO: Return an exception if cannot flip
         #   either because the edge is on the hull
