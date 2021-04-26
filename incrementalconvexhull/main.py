@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+import math
 import textwrap
 
 import numpy as np
@@ -8,17 +9,23 @@ from .graph import Graph, Vertex
 from .point import dist
 
 
+FPS = 60
+DEFAULT_ANIMATION_DURATION = 0.5
+
+
 VERT_COLOR = (127, 127, 127)
 HOVERED_VERT_COLOR = (255, 0, 0)
 EDGE_COLOR = (95, 95, 95)
-HOVERED_EDGE_COLOR = (63, 63, 255)
+HOVERED_EDGE_COLOR = (127, 127, 127)
+FLIPPABLE_EDGE_COLOR = (63, 63, 255)
 GHOST_EDGE_COLOR = (47, 47, 47)
-
+CROSS_EDGE_COLOR = (127, 47, 47)
 
 VERT_RADIUS = 3.0
 HOVERED_VERT_RADIUS = 4.0
 EDGE_RADIUS = 1.0
-HOVERED_EDGE_RADIUS = 2.0
+HOVERED_EDGE_RADIUS = 1.5
+HOVERED_EDGE_RADIUS_FLIPPABLE = 2.0
 GHOST_EDGE_RADIUS = 1.0
 
 VERTEX_HOVER_RADIUS = 15.0
@@ -50,14 +57,21 @@ class VisualizationWindow(pyglet.window.Window):
         self.mouse_pos = np.array([0.0, 0.0])
         self.hover_target = None
 
+        # Animation state
+        self.animation_progress = 0.0
+        self.queued_flip_animations = []
+        self.queued_vertex_to_add = None
+
+        pyglet.clock.schedule_interval(self.step_animation, 1/FPS)
+
     ###########################################################################
     # INPUT
 
     def on_key_press(self, symbol, modifiers):
-        if symbol == pyglet.window.key.F and self.animation_multiplier > 1/4:
-            self.animation_multiplier /= 5 ** (1/4)
-        if symbol == pyglet.window.key.S and self.animation_multiplier < 4:
+        if symbol == pyglet.window.key.F and self.animation_multiplier < 4:
             self.animation_multiplier *= 5 ** (1/4)
+        if symbol == pyglet.window.key.S and self.animation_multiplier > 1/4:
+            self.animation_multiplier /= 5 ** (1/4)
 
     def on_mouse_motion(self, x, y, dx, dy):
         self.update_nearest_thing(x, y)
@@ -68,18 +82,29 @@ class VisualizationWindow(pyglet.window.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         if button != pyglet.window.mouse.LEFT:
             return
+        if self.is_animation_in_progress():
+            return
         if isinstance(self.hover_target, Vertex):
             self.graph.remove_vertex(self.hover_target)
-        if self.hover_target is None:
-            # TODO: handle None, None (if z is on interior)
-            v1 = self.graph.add_vertex(*self.mouse_pos)
-            for v2 in self.graph[:len(self.graph)-1]:
-                self.graph.add_edge(v1, v2)
-        self.update_nearest_thing()
+        if isinstance(self.hover_target, tuple):
+            if self.graph.can_flip(*self.hover_target):
+                self.queued_flip_animations.append(self.hover_target)
+        if self.hover_target is None and not self.graph.hull_contains(*self.mouse_pos):
+            try:
+                a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
+                self.queued_flip_animations += self.graph.get_cross_edges(a, b)
+                self.queued_vertex_to_add = self.mouse_pos
+            except ValueError:
+                self.graph.add_vertex(*self.mouse_pos)
+        self.update_nearest_thing(x, y)
 
     def update_nearest_thing(self, x=None, y=None):
         if x is not None and y is not None:
             self.mouse_pos = np.array([float(x), float(y)])
+
+        if self.is_animation_in_progress():
+            self.hover_target = None
+            return
 
         nearest_vertex = None
         if self.graph.vertices:
@@ -108,8 +133,6 @@ class VisualizationWindow(pyglet.window.Window):
     def on_draw(self):
         self.clear()
 
-        mouse_vertex = Vertex(*self.mouse_pos)
-
         # Update text
         self.update_instructions_text()
         self.instructions_label.draw()
@@ -125,22 +148,35 @@ class VisualizationWindow(pyglet.window.Window):
         # - graph vertices
 
         # Draw ghost edges
-        if self.hover_target is None:
+        if self.hover_target is None and not self.is_animation_in_progress():
             try:
-                v1, v2 = self.graph.find_convex_nbrs(mouse_vertex)
+                v1, v2 = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
                 if v1 is not None and v2 is not None:
                     radius = GHOST_EDGE_RADIUS
                     color = GHOST_EDGE_COLOR
-                    self.draw_graph_edge(mouse_vertex, v1, radius, color)
-                    self.draw_graph_edge(mouse_vertex, v2, radius, color)
+                    self.draw_graph_edge(self.mouse_pos, v1.loc, radius, color)
+                    self.draw_graph_edge(self.mouse_pos, v2.loc, radius, color)
+                    color = CROSS_EDGE_COLOR
+                    self.draw_graph_edge(v1.loc, v2.loc, radius, color)
             except ValueError:
                 pass  # ok if it fails
 
         # Draw edges in the graph
         for e in self.graph.edges():
-            radius = HOVERED_EDGE_RADIUS if e == self.hover_target else EDGE_RADIUS
-            color = HOVERED_EDGE_COLOR if e == self.hover_target else EDGE_COLOR
-            self.draw_graph_edge(*e, radius, color)
+            if e == self.hover_target or self.is_flip_queued(e):
+                radius = HOVERED_EDGE_RADIUS
+                if self.graph.can_flip(*e):
+                    color = FLIPPABLE_EDGE_COLOR
+                else:
+                    color = HOVERED_EDGE_COLOR
+            else:
+                radius = EDGE_RADIUS
+                color = EDGE_COLOR
+            if self.is_next_flip_queued(e):
+                self.draw_graph_edge_flip_animation(*e, radius, color)
+            else:
+                v1, v2 = e
+                self.draw_graph_edge(v1.loc, v2.loc, radius, color)
 
         # Draw vertices in the graph
         for v in self.graph.vertices:
@@ -177,9 +213,23 @@ class VisualizationWindow(pyglet.window.Window):
         coords = [(x1, y1), (x2, y1), (x1, y2), (x2, y2)]
         self.draw_quad(coords, color)
 
-    def draw_graph_edge(self, v1, v2, radius, color):
+    def draw_graph_edge_flip_animation(self, v1, v2, radius, color):
+        n1 = v1.get_next_nbr(v2).loc
+        n2 = v2.get_next_nbr(v1).loc
+        v1 = v1.loc
+        v2 = v2.loc
+
+        # Swap points if it will make the animation cover less distance.
+        if dist(v1, n1) + dist(v2, n2) > dist(v1, n2) + dist(v2, n1):
+            n1, n2 = n2, n1
+
+        # Interpolate between the old vertices and the new ones.
+        p1 = interpolate(v1, n1, self.animation_progress)
+        p2 = interpolate(v2, n2, self.animation_progress)
+        self.draw_graph_edge(p1, p2, radius, color)
+
+    def draw_graph_edge(self, a, b, radius, color):
         """Add a graph edge to the draw list."""
-        a, b = v1.loc, v2.loc
         fwd = b - a
         fwd *= np.true_divide(radius, np.linalg.norm(fwd))
         left = np.array([-fwd[1], fwd[0]])  # rotate `fwd` counterclockwise 90
@@ -203,6 +253,37 @@ class VisualizationWindow(pyglet.window.Window):
 
     def num_verts(self):
         return len(self.vertex_coords) // 2
+
+    def is_flip_queued(self, e):
+        v1, v2 = e
+        return ((v1, v2) in self.queued_flip_animations
+                or (v2, v1) in self.queued_flip_animations)
+
+    def is_next_flip_queued(self, e):
+        if not self.queued_flip_animations:
+            return False
+        v1, v2 = e
+        next_queued = self.queued_flip_animations[0]
+        return (v1, v2) == next_queued or (v2, v1) == next_queued
+
+    def is_animation_in_progress(self):
+        return self.queued_flip_animations or self.queued_vertex_to_add is not None
+
+    def step_animation(self, dt):
+        if self.queued_flip_animations:
+            self.animation_progress += (self.animation_multiplier * dt
+                                        / DEFAULT_ANIMATION_DURATION)
+            if self.animation_progress >= 1:
+                self.graph.flip_edge(*self.queued_flip_animations.pop(0))
+                self.animation_progress = 0.0
+                self.update_nearest_thing()
+        elif self.queued_vertex_to_add is not None:
+            new_vertex = self.graph.add_vertex(*self.queued_vertex_to_add)
+            self.queued_vertex_to_add = None
+            i = self.graph.vertices.index(new_vertex)
+            v1 = self.graph[i-1]
+            v2 = self.graph[i+1]
+            self.update_nearest_thing()
 
 
 def flatten(it):
@@ -233,6 +314,17 @@ def dist_point_to_line_segment(a, b, p):
         return None
     v_perpendicular = v - n * v_parallel
     return np.linalg.norm(v_perpendicular)
+
+
+def interpolate(a, b, t):
+    """Interpolate between two points."""
+    t = -(math.cos(math.pi * t) - 1) / 2
+    return lerp(a, b, t)
+
+
+def lerp(a, b, t):
+    """Linearly interpolate between two points."""
+    return t * b + (1 - t) * a
 
 
 def main():
