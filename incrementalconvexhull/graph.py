@@ -261,23 +261,38 @@ class Vertex:
         """Add another vertex as a neighbor to this one."""
         size = len(self.nbrs)
 
-        if v in self.nbrs:
-            return  # The vertex is already a neighbor
-
-        # Case 1: List has less than 2 elements
+        # List has less than 2 elements
         if size < 2:
             self.nbrs.append(v)
 
-        # Case 2: Search through nbrs to find correct location
-        prev_orient, curr_orient = 0, 0
-        for v1, v2 in self.nbr_pairs():
-            curr_orient = point.orient(v1.loc, v2.loc, v.loc)
-            if curr_orient == (prev_orient * -1):
-                idx = self.nbrs.index(v2) + 1
-                self.nbrs.insert(idx, v)
-                break
-            else:
-                prev_orient = curr_orient
+        # Search through nbrs to find correct location
+        else:
+            # Between last and first point - will not appear in adjacent pairs list
+            if point.orient(self.nbrs[-1].loc, v.loc, self.nbrs[0].loc) == 1:
+                if (point.orient(self.nbrs[-2].loc, self.nbrs[-1].loc, v.loc)) == 1:
+                    if (point.orient(v.loc, self.nbrs[0].loc, self.nbrs[1].loc)) == 1:
+                        self.nbrs.insert(0, v)
+
+            # Iterate through adjacent pairs of verticies
+            for v1, v2 in self.nbr_pairs():
+                # If v1, v, v2 is CCW
+                if point.orient(v1.loc, v.loc, v2.loc) == 1:
+                    # Save position of v2 for special case indexing
+                    idx = self.nbrs.index(v2)
+
+                    # Special Case Indexing if v1 = n-2 and v2 = n-1
+                    if idx == size - 1:
+                        if point.orient(self.nbrs[(idx - 2)].loc, v1.loc, v.loc) == 1:
+                            # if v, v2, v2+ 1 is CCW
+                            if point.orient(v.loc, v2.loc, self.nbrs[0].loc) == 1:
+                                self.nbrs.insert(idx, v)
+
+                    # No special indexing needed
+                    else:
+                        if point.orient(self.nbrs[(idx - 2)].loc, v1.loc, v.loc) == 1:
+                            # if v, v2, v2+ 1 is CCW
+                            if point.orient(v.loc, v2.loc, self.nbrs[(idx + 1)].loc) == 1:
+                                self.nbrs.insert(idx, v)
 
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
