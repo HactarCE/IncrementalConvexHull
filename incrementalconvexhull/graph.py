@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import operator
-from typing import List, Sequence, Tuple, Union
+from typing import List, Sequence, Union
 
 import numpy as np
 
@@ -100,6 +100,9 @@ class Graph:
             stop = len(self)
         if step is None:
             step = 1
+        if len(self) > 0:
+            while stop < start:
+                stop += len(self)
         return range(start, stop, step)
 
     def index(self, v: Vertex):

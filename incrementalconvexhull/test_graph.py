@@ -4,7 +4,45 @@ from . import graph
 
 class PolygonTest(unittest.TestCase):
     def test_add_vertex(self):
-        pass
+        g = graph.Graph()
+
+        # Add three vertices in *gasp* clockwise order! Oh no!
+        g.add_vertex(-0.5, -0.5)
+        g.add_vertex(0, 2)
+        g.add_vertex(2, 0)
+
+        self.assertEqual(3, len(g.vertices))
+
+        first_vertex = g.vertices[0]
+        second_vertex = g.vertices[1]
+        if (first_vertex.loc[0] == -0.5):
+            self.assertEqual(2, second_vertex.loc[0])
+        elif (first_vertex.loc[0] == 0):
+            self.assertEqual(-0.5, second_vertex.loc[0])
+        elif (first_vertex.loc[0] == 2):
+            self.assertEqual(0, second_vertex.loc[0])
+        else:
+            self.fail("First vertex had unrecognized x coordinate")
+
+        # These vertices are on or inside the current hull. Don't add them!
+        g.add_vertex(0, 0)
+        g.add_vertex(1, 1)
+        self.assertEqual(3, len(g.vertices))
+
+        # Add a fourth valid vertex and check our neighbors.
+        # We shouldn't have needed to do any flips.
+        g.add_vertex(1.5, 1.5)
+        self.assertEqual(4, len(g.vertices))
+
+        x_axis_vertex = next(v for v in g.vertices if v.loc[1] == 0)
+        y_axis_vertex = next(v for v in g.vertices if v.loc[0] == 0)
+        neg_vertex = next(v for v in g.vertices if v.loc[0] < 0)
+        fourth_vertex = next(v for v in g.vertices if v.loc[0] == 1.5)
+
+        self.assertEqual(3, len(x_axis_vertex.nbrs))
+        self.assertEqual(3, len(y_axis_vertex.nbrs))
+        self.assertEqual(2, len(neg_vertex.nbrs))
+        self.assertEqual(2, len(fourth_vertex.nbrs))
 
     def test_remove_vertex(self):
         pass
