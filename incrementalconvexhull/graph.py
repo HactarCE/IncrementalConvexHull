@@ -26,11 +26,13 @@ class Graph:
         due to the addition of z are removed.
         """
         z = Vertex(x, y)
-        a, b = None, None
 
         if len(self) < 2:
             # 2 or fewer vertices are always in ccw order
             self.vertices.append(z)
+            if len(self) == 2:
+                # Add edge between both vertices
+                self.add_edge(*self.vertices)
         else:
             # Don't do anything if the point to add is already within the convex hull.
             if self.hull_contains(x, y):
@@ -51,10 +53,8 @@ class Graph:
             # Keep vertices in ccw order
             self.vertices.insert(self.index(b), z)
 
-        if a is not None:
             self.add_edge(a, z)
-            if b is not None and a is not b:
-                self.add_edge(b, z)
+            self.add_edge(b, z)
 
         return z
 
