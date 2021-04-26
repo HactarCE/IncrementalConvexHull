@@ -238,6 +238,9 @@ class Vertex:
         """Add another vertex as a neighbor to this one."""
         size = len(self.nbrs)
 
+        if v in self.nbrs:
+            return  # The vertex is already a neighbor
+
         # Case 1: List has less than 2 elements
         if size < 2:
             self.nbrs.append(v)
