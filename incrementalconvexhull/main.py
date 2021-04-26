@@ -339,6 +339,7 @@ def dist_point_to_line_segment(a, b, p):
 
 def interpolate(a, b, t):
     """Interpolate between two points."""
+    # Use circular easing (from https://easings.net/#easeInOutCirc)
     t = -(math.cos(math.pi * t) - 1) / 2
     return lerp(a, b, t)
 
