@@ -262,7 +262,7 @@ class Vertex:
     def get_next_nbr(self, v) -> Vertex:
         """Returns the next neighboring vertex in counterclockwise order."""
         idx = self.nbrs.index(v)
-        if (idx == len(self.nbrs - 1)):
+        if idx == len(self.nbrs) - 1:
             return self.nbrs[0]
         return self.nbrs[idx + 1]
 
