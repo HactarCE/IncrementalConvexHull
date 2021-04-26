@@ -261,7 +261,7 @@ class Graph:
 
         for rv in right_slice:
             for lv in reversed(left_slice):
-                if rv.nbrs.contains(lv):
+                if lv in rv.nbrs:
                     yield (rv, lv)
 
 

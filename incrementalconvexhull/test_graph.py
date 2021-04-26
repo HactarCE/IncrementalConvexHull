@@ -44,6 +44,10 @@ class PolygonTest(unittest.TestCase):
         self.assertEqual(2, len(neg_vertex.nbrs))
         self.assertEqual(2, len(fourth_vertex.nbrs))
 
+        # Add a vertex that should cause a flip!
+        g.add_vertex(3, -1)
+        self.assertEqual(4, len(g.vertices))
+
     def test_remove_vertex(self):
         pass
 
