@@ -148,18 +148,10 @@ class VisualizationWindow(pyglet.window.Window):
         # - graph vertices
 
         # Draw ghost edges
-        if self.hover_target is None and not self.is_animation_in_progress():
-            try:
-                v1, v2 = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
-                if v1 is not None and v2 is not None:
-                    radius = GHOST_EDGE_RADIUS
-                    color = GHOST_EDGE_COLOR
-                    self.draw_graph_edge(self.mouse_pos, v1.loc, radius, color)
-                    self.draw_graph_edge(self.mouse_pos, v2.loc, radius, color)
-                    color = CROSS_EDGE_COLOR
-                    self.draw_graph_edge(v1.loc, v2.loc, radius, color)
-            except ValueError:
-                pass  # ok if it fails
+        if self.queued_vertex_to_add is not None:
+            self.draw_ghost_edges(self.queued_vertex_to_add)
+        elif self.hover_target is None:
+            self.draw_ghost_edges(self.mouse_pos)
 
         # Draw edges in the graph
         for e in self.graph.edges():
@@ -227,6 +219,19 @@ class VisualizationWindow(pyglet.window.Window):
         p1 = interpolate(v1, n1, self.animation_progress)
         p2 = interpolate(v2, n2, self.animation_progress)
         self.draw_graph_edge(p1, p2, radius, color)
+
+    def draw_ghost_edges(self, new_pos):
+        try:
+            v1, v2 = self.graph.find_convex_nbrs(Vertex(*new_pos))
+            if v1 is not None and v2 is not None:
+                radius = GHOST_EDGE_RADIUS
+                color = GHOST_EDGE_COLOR
+                self.draw_graph_edge(new_pos, v1.loc, radius, color)
+                self.draw_graph_edge(new_pos, v2.loc, radius, color)
+                color = CROSS_EDGE_COLOR
+                self.draw_graph_edge(v1.loc, v2.loc, radius, color)
+        except ValueError:
+            pass  # ok if it fails
 
     def draw_graph_edge(self, a, b, radius, color):
         """Add a graph edge to the draw list."""
