@@ -88,7 +88,10 @@ class VisualizationWindow(pyglet.window.Window):
         if isinstance(self.hover_target, tuple):
             if self.graph.can_flip(*self.hover_target):
                 self.queued_flip_animations.append(self.hover_target)
+            print("Flip edge between", self.hover_target[0],
+                  "and", self.hover_target[1])
         if isinstance(self.hover_target, Vertex):
+            print("Remove vertex at", self.hover_target.loc)
             try:
                 v = self.hover_target
                 self.queued_flip_animations += [(v, n) for n in v.nbrs
@@ -97,6 +100,7 @@ class VisualizationWindow(pyglet.window.Window):
             except ValueError:
                 self.graph.remove_vertex(*self.mouse_pos)
         if self.hover_target is None and not self.graph.hull_contains(*self.mouse_pos):
+            print("Add vertex at", self.mouse_pos)
             try:
                 a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
                 self.queued_flip_animations += self.graph.get_cross_edges(a, b)
