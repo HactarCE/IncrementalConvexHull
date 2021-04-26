@@ -120,6 +120,31 @@ class Graph:
                 if nbr not in visited:
                     yield (v, nbr)
 
+    def can_flip(self, v1: Vertex, v2: Vertex):
+        """Returns whether an edge in the graph can be flipped. See flip_edge()."""
+        try:
+            self.check_can_flip(v1, v2)
+            return True
+        except ValueError:
+            return False
+
+    def check_can_flip(self, v1: Vertex, v2: Vertex):
+        """Returns a ValueError if an edge in the graph cannot be flipped. See flip_edge()."""
+        try:
+            i1 = self.vertices.index(v1)
+            i2 = self.vertices.index(v2)
+        except ValueError:
+            raise ValueError("vertex not in graph")
+
+        diff = abs(i1 - i2)
+        if diff == 1 or diff == len(self) - 1:
+            raise ValueError("edge is on convex hull")
+
+        if v1 in v2.nbrs:
+            return  # Edge exists and can be flipped!
+        else:
+            raise ValueError("edge does not exist")
+
     def flip_edge(self, v1: Vertex, v2: Vertex):
         """Flip an edge between two vertices in graph.
 
@@ -138,9 +163,7 @@ class Graph:
         the edge is never concave because the vertices of the graph form a
         convex polygon.
         """
-        # TODO: Return an exception if cannot flip
-        #   either because the edge is on the hull
-        #   or because the quadrilateral is concave
+        self.check_can_flip(v1, v2)
         n1 = v1.get_next_nbr(v2)
         n2 = v2.get_next_nbr(v1)
         self.remove_edge(v1, v2)
