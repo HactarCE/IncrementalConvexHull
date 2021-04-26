@@ -24,6 +24,13 @@ class Graph:
         If the point is already on the interior of the convex hull, no action is taken.
         Similarly, any vertices currently on the hull that become interior vertices
         due to the addition of z are removed.
+
+        Params:
+            x: x coordinate of vertex
+            y: y coordinate of vertex
+
+        Returns:
+            None
         """
         z = Vertex(x, y)
 
@@ -61,6 +68,14 @@ class Graph:
     def hull_contains(self, x, y):
         """Return whether an XY position is inside the convex hull of the
         vertices of the graph.
+
+        Params:
+            x: position x coordinate
+            y: position y coordinate
+
+        Returns:
+            True if point is contained within the hull.
+            False if the point is on the convex hull boundary or outside of the hull.
         """
         if (len(self.vertices) < 3):
             return False
@@ -71,7 +86,9 @@ class Graph:
         return True
 
     def __len__(self) -> int:
-        """Return the number of vertices in the graph."""
+        """Return the number of vertices in the graph.
+
+        """
         return len(self.vertices)
 
     def __getitem__(self, i) -> Union[Vertex, Sequence[Vertex, None, None]]:
