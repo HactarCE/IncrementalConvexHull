@@ -61,6 +61,7 @@ class VisualizationWindow(pyglet.window.Window):
         self.animation_progress = 0.0
         self.queued_flip_animations = []
         self.queued_vertex_to_add = None
+        self.queued_vertex_to_remove = None
 
         pyglet.clock.schedule_interval(self.step_animation, 1/FPS)
 
@@ -84,11 +85,17 @@ class VisualizationWindow(pyglet.window.Window):
             return
         if self.is_animation_in_progress():
             return
-        if isinstance(self.hover_target, Vertex):
-            self.graph.remove_vertex(self.hover_target)
         if isinstance(self.hover_target, tuple):
             if self.graph.can_flip(*self.hover_target):
                 self.queued_flip_animations.append(self.hover_target)
+        if isinstance(self.hover_target, Vertex):
+            try:
+                v = self.hover_target
+                self.queued_flip_animations += [(v, n) for n in v.nbrs
+                                                if self.graph.can_flip(v, n)]
+                self.queued_vertex_to_remove = v
+            except ValueError:
+                self.graph.remove_vertex(*self.mouse_pos)
         if self.hover_target is None and not self.graph.hull_contains(*self.mouse_pos):
             try:
                 a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
@@ -150,7 +157,7 @@ class VisualizationWindow(pyglet.window.Window):
         # Draw ghost edges
         if self.queued_vertex_to_add is not None:
             self.draw_ghost_edges(self.queued_vertex_to_add)
-        elif self.hover_target is None:
+        elif self.hover_target is None and not self.is_animation_in_progress():
             self.draw_ghost_edges(self.mouse_pos)
 
         # Draw edges in the graph
@@ -272,7 +279,9 @@ class VisualizationWindow(pyglet.window.Window):
         return (v1, v2) == next_queued or (v2, v1) == next_queued
 
     def is_animation_in_progress(self):
-        return self.queued_flip_animations or self.queued_vertex_to_add is not None
+        return bool(self.queued_flip_animations
+                    or self.queued_vertex_to_add is not None
+                    or self.queued_vertex_to_remove is not None)
 
     def step_animation(self, dt):
         if self.queued_flip_animations:
@@ -283,11 +292,12 @@ class VisualizationWindow(pyglet.window.Window):
                 self.animation_progress = 0.0
                 self.update_nearest_thing()
         elif self.queued_vertex_to_add is not None:
-            new_vertex = self.graph.add_vertex(*self.queued_vertex_to_add)
+            self.graph.add_vertex(*self.queued_vertex_to_add)
             self.queued_vertex_to_add = None
-            i = self.graph.vertices.index(new_vertex)
-            v1 = self.graph[i-1]
-            v2 = self.graph[i+1]
+            self.update_nearest_thing()
+        elif self.queued_vertex_to_remove is not None:
+            self.graph.remove_vertex(self.queued_vertex_to_remove)
+            self.queued_vertex_to_remove = None
             self.update_nearest_thing()
 
 
