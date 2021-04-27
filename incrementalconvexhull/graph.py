@@ -399,6 +399,7 @@ class Vertex:
                 if (point.orient(self.nbrs[-2].loc, self.nbrs[-1].loc, v.loc)) == 1:
                     if (point.orient(v.loc, self.nbrs[0].loc, self.nbrs[1].loc)) == 1:
                         self.nbrs.insert(0, v)
+                        return
 
             # Iterate through adjacent pairs of verticies
             for v1, v2 in self.nbr_pairs():
@@ -413,6 +414,7 @@ class Vertex:
                             # if v, v2, v2+ 1 is CCW
                             if point.orient(v.loc, v2.loc, self.nbrs[0].loc) == 1:
                                 self.nbrs.insert(idx, v)
+                                return
 
                     # No special indexing needed
                     else:
@@ -420,6 +422,7 @@ class Vertex:
                             # if v, v2, v2+ 1 is CCW
                             if point.orient(v.loc, v2.loc, self.nbrs[(idx + 1)].loc) == 1:
                                 self.nbrs.insert(idx, v)
+                                return
 
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
