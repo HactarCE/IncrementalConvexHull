@@ -329,7 +329,7 @@ class VisualizationWindow(pyglet.window.Window):
 
     def replay_line(self, line):
         line = line.lower()
-        coords = [float(x) for x in re.findall(r'[\d\.]+', line)]
+        coords = [float(x) for x in re.findall(r'[\d]+\.', line)]
 
         if line.startswith('add'):
             # Add vertex
