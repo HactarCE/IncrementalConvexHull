@@ -9,6 +9,8 @@ from .graph import Graph, Vertex
 from .point import dist
 
 
+WIDTH = 960
+HEIGHT = 720
 FPS = 60
 DEFAULT_ANIMATION_DURATION = 0.5
 
