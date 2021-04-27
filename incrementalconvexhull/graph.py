@@ -47,8 +47,11 @@ class Graph:
 
             # From the perspective of z, the point a should be to its left, and b should
             # be to its right
-            # TODO: handle None, None (if z is on interior)
             a, b = self.find_convex_nbrs(z)
+            if a is None and b is None:
+                raise ValueError(
+                    "new vertex is colinear or inside convex hull"
+                )
 
             self.flip_between(a, b)
 

@@ -319,7 +319,10 @@ class VisualizationWindow(pyglet.window.Window):
                 self.animation_progress = 0.0
                 self.update_nearest_thing()
         elif action == 'add':
-            self.graph.add_vertex(*loc)
+            try:
+                self.graph.add_vertex(*loc)
+            except ValueError as e:
+                print("Failed to add vertex:", e)
             self.animation_queue.pop(0)
             self.update_nearest_thing()
         elif action == 'remove':
