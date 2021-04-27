@@ -178,7 +178,16 @@ class Graph:
             return False
 
     def check_can_flip(self, v1: Vertex, v2: Vertex):
-        """Returns a ValueError if an edge in the graph cannot be flipped. See flip_edge()."""
+        """Returns a ValueError if an edge in the graph cannot be flipped. See flip_edge().
+
+        Params:
+            v1 (Vertex):
+            v2 (Vertex):
+
+        Returns:
+            True if an edge can be flipped between the 2 verticies
+            False if the edge cannot be flipped between the 2 veritices
+        """
         try:
             i1 = self.vertices.index(v1)
             i2 = self.vertices.index(v2)
@@ -211,6 +220,13 @@ class Graph:
         Note that the quadrilateral formed by the triangles on either side of
         the edge is never concave because the vertices of the graph form a
         convex polygon.
+
+        Params:
+            v1 (Vertex):
+            v2 (Vertex):
+
+        Returns:
+            None
         """
         self.check_can_flip(v1, v2)
         n1 = v1.get_next_nbr(v2)
@@ -219,7 +235,14 @@ class Graph:
         self.add_edge(n1, n2)
 
     def remove_vertex(self, v1: Vertex):
-        """Remove a vertex and all its edges from the graph."""
+        """Remove a vertex and all its edges from the graph.
+
+        Params:
+            v1 (Vertex): Vertex to be removed from the graph
+
+        Returns:
+            None
+        """
         # Remove v1 from associated neighbors
         for node in v1.nbrs:
             node.nbrs.remove(v1)
@@ -228,7 +251,15 @@ class Graph:
         self.vertices.remove(v1)
 
     def remove_edge(self, v1: Vertex, v2: Vertex):
-        """Remove the edge between two vertictes from the graph."""
+        """Remove the edge between two vertictes from the graph.
+
+        Params:
+            v1 (Vertex): Vertex at the end of edge to be removed
+            v2 (Vertex): Vertex at the opposing end of the edge to be removed
+
+        Returns:
+            None
+        """
         # Remove V1 from V2 nbrs
         v1.remove_neighbor(v2)
 
