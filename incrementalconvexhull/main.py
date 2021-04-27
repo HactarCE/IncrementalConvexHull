@@ -59,9 +59,7 @@ class VisualizationWindow(pyglet.window.Window):
 
         # Animation state
         self.animation_progress = 0.0
-        self.queued_flip_animations = []
-        self.queued_vertex_to_add = None
-        self.queued_vertex_to_remove = None
+        self.animation_queue = []
 
         pyglet.clock.schedule_interval(self.step_animation, 1/FPS)
 
@@ -83,37 +81,38 @@ class VisualizationWindow(pyglet.window.Window):
     def on_mouse_press(self, x, y, button, modifiers):
         if button != pyglet.window.mouse.LEFT:
             return
-        if self.is_animation_in_progress():
+        if self.animation_queue:
             return
         if isinstance(self.hover_target, tuple):
             if self.graph.can_flip(*self.hover_target):
-                self.queued_flip_animations.append(self.hover_target)
+                self.animation_queue.append(('flip', self.hover_target))
             print("Flip edge between", self.hover_target[0],
                   "and", self.hover_target[1])
         if isinstance(self.hover_target, Vertex):
             print("Remove vertex at", self.hover_target.loc)
             try:
                 v = self.hover_target
-                self.queued_flip_animations += [(v, n) for n in v.nbrs
-                                                if self.graph.can_flip(v, n)]
-                self.queued_vertex_to_remove = v
+                self.animation_queue += [('flip', (v, n)) for n in v.nbrs
+                                         if self.graph.can_flip(v, n)]
             except ValueError:
-                self.graph.remove_vertex(*self.mouse_pos)
+                pass
+            self.animation_queue.append(('remove', v))
         if self.hover_target is None and not self.graph.hull_contains(*self.mouse_pos):
             print("Add vertex at", self.mouse_pos)
             try:
                 a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
-                self.queued_flip_animations += self.graph.get_cross_edges(a, b)
-                self.queued_vertex_to_add = self.mouse_pos
+                self.animation_queue += [('flip', e)
+                                         for e in self.graph.get_cross_edges(a, b)]
             except ValueError:
-                self.graph.add_vertex(*self.mouse_pos)
+                pass
+            self.animation_queue.append(('add', self.mouse_pos))
         self.update_nearest_thing(x, y)
 
     def update_nearest_thing(self, x=None, y=None):
         if x is not None and y is not None:
             self.mouse_pos = np.array([float(x), float(y)])
 
-        if self.is_animation_in_progress():
+        if self.animation_queue:
             self.hover_target = None
             return
 
@@ -159,9 +158,14 @@ class VisualizationWindow(pyglet.window.Window):
         # - graph vertices
 
         # Draw ghost edges
-        if self.queued_vertex_to_add is not None:
-            self.draw_ghost_edges(self.queued_vertex_to_add)
-        elif self.hover_target is None and not self.is_animation_in_progress():
+        if self.animation_queue:
+            for action, loc in self.animation_queue:
+                if action == 'add':
+                    self.draw_ghost_edges(loc)
+                    break
+                if action == 'remove':
+                    break
+        elif self.hover_target is None:
             self.draw_ghost_edges(self.mouse_pos)
 
         # Draw edges in the graph
@@ -274,36 +278,36 @@ class VisualizationWindow(pyglet.window.Window):
 
     def is_flip_queued(self, e):
         v1, v2 = e
-        return ((v1, v2) in self.queued_flip_animations
-                or (v2, v1) in self.queued_flip_animations)
+        return (('flip', (v1, v2)) in self.animation_queue
+                or ('flip', (v2, v1)) in self.animation_queue)
 
     def is_next_flip_queued(self, e):
-        if not self.queued_flip_animations:
+        if not self.animation_queue:
             return False
         v1, v2 = e
-        next_queued = self.queued_flip_animations[0]
-        return (v1, v2) == next_queued or (v2, v1) == next_queued
-
-    def is_animation_in_progress(self):
-        return bool(self.queued_flip_animations
-                    or self.queued_vertex_to_add is not None
-                    or self.queued_vertex_to_remove is not None)
+        next_queued = self.animation_queue[0]
+        return (('flip', (v1, v2)) == next_queued
+                or ('flip', (v2, v1)) == next_queued)
 
     def step_animation(self, dt):
-        if self.queued_flip_animations:
+        if not self.animation_queue:
+            return
+        action, loc = self.animation_queue[0]
+        if action == 'flip':
             self.animation_progress += (self.animation_multiplier * dt
                                         / DEFAULT_ANIMATION_DURATION)
             if self.animation_progress >= 1:
-                self.graph.flip_edge(*self.queued_flip_animations.pop(0))
+                self.graph.flip_edge(*loc)
+                self.animation_queue.pop(0)
                 self.animation_progress = 0.0
                 self.update_nearest_thing()
-        elif self.queued_vertex_to_add is not None:
-            self.graph.add_vertex(*self.queued_vertex_to_add)
-            self.queued_vertex_to_add = None
+        elif action == 'add':
+            self.graph.add_vertex(*loc)
+            self.animation_queue.pop(0)
             self.update_nearest_thing()
-        elif self.queued_vertex_to_remove is not None:
-            self.graph.remove_vertex(self.queued_vertex_to_remove)
-            self.queued_vertex_to_remove = None
+        elif action == 'remove':
+            self.graph.remove_vertex(loc)
+            self.animation_queue.pop(0)
             self.update_nearest_thing()
 
 
