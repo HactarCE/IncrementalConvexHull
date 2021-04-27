@@ -35,8 +35,8 @@ EDGE_HOVER_RADIUS = 10.0
 class VisualizationWindow(pyglet.window.Window):
     def __init__(self):
         super().__init__(
-            width=960,
-            height=720,
+            width=WIDTH,
+            height=HEIGHT,
             config=pyglet.gl.Config(sample_buffers=1, samples=4),
             file_drops=True,
         )
