@@ -148,7 +148,12 @@ class Graph:
 
         Returns:
             None
+            Raise ValueError if a duplicate edge is being added to graph
         """
+        # Check for a duplicate edge before adding
+        if v2 in v1.nbrs:
+            raise ValueError("Edge already exists between Verticies.")
+
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
 
@@ -267,7 +272,15 @@ class Graph:
         v2.remove_neighbor(v1)
 
     def find_convex_nbrs(self, v: Vertex):
-        """Find neighbors of the newly inserted point in the existing graph"""
+        """Find neighbors of the newly inserted point in the existing graph
+
+        Params:
+            v (Vertex): Vertex to be inserted into the graph
+
+        Returns:
+            None
+            Raise ValueError if there are less than 2 points in the graph
+        """
         size = len(self.vertices)
 
         if size < 2:
@@ -301,17 +314,39 @@ class Graph:
     def vertex_pairs(self):
         """Return a generator over all pairs of adjacent points on the convex
         hull.
+
+        Params:
+            None
+
+        Returns:
+            Generator of all pairs of adjacent points in the form (Vertex, Vertex)
         """
         for i in range(len(self)):
             yield (self[i], self[i+1])
 
     def flip_between(self, a: Vertex, b: Vertex):
-        """Transform the given graph's triangulation such that an edge between a and b exists."""
+        """Transform the given graph's triangulation such that an edge between a and b exists.
+
+        Params:
+            a (Vertex):
+            b (Vertex):
+
+        Returns:
+            None
+        """
         for c in self.get_cross_edges(a, b):
             self.flip_edge(*c)
 
     def get_cross_edges(self, a: Vertex, b: Vertex):
-        """Compute the edges in the graph that cross the line through the specified vertices."""
+        """Compute the edges in the graph that cross the line through the specified vertices.
+
+        Params:
+            a (Vertex):
+            b (Vertex):
+
+        Returns:
+            None
+        """
         # When looking "across" the hull from a to b, the vertices in the right
         # slice are on the right-hand side from the perspective of a.
         ai = self.index(a)
@@ -333,7 +368,12 @@ class Vertex:
     """
 
     def __init__(self, x, y):
-        """Create a vertex with an XY location and empty neighbors list."""
+        """Create a vertex with an XY location and empty neighbors list.
+
+        Params:
+            x (float):
+            y (float):
+        """
         self.loc = np.array([x, y])
         self.nbrs: List[Vertex] = []
 
