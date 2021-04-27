@@ -203,6 +203,8 @@ class VisualizationWindow(pyglet.window.Window):
         Click near an edge to flip it.
         Click on a vertex to remove it.
 
+        Cursor: ({int(self.mouse_pos[0])}, {int(self.mouse_pos[1])})
+
         Animation multiplier: {self.animation_multiplier:.2f}
         [f] faster
         [s] slower
