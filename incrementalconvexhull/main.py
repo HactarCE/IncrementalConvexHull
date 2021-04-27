@@ -1,9 +1,9 @@
 from collections.abc import Iterable
 import math
-import textwrap
-
 import numpy as np
 import pyglet
+import re
+import textwrap
 
 from .graph import Graph, Vertex
 from .point import dist
@@ -38,6 +38,7 @@ class VisualizationWindow(pyglet.window.Window):
             width=960,
             height=720,
             config=pyglet.gl.Config(sample_buffers=1, samples=4),
+            file_drops=True,
         )
 
         # UI elements
@@ -60,6 +61,7 @@ class VisualizationWindow(pyglet.window.Window):
         # Animation state
         self.animation_progress = 0.0
         self.animation_queue = []
+        self.replay_lines = []
 
         pyglet.clock.schedule_interval(self.step_animation, 1/FPS)
 
@@ -85,28 +87,17 @@ class VisualizationWindow(pyglet.window.Window):
             return
         if isinstance(self.hover_target, tuple):
             if self.graph.can_flip(*self.hover_target):
-                self.animation_queue.append(('flip', self.hover_target))
-            print("Flip edge between", self.hover_target[0],
-                  "and", self.hover_target[1])
+                self.enqueue_anim('flip', self.hover_target)
         if isinstance(self.hover_target, Vertex):
-            print("Remove vertex at", self.hover_target.loc)
-            try:
-                v = self.hover_target
-                self.animation_queue += [('flip', (v, n)) for n in v.nbrs
-                                         if self.graph.can_flip(v, n)]
-            except ValueError:
-                pass
-            self.animation_queue.append(('remove', v))
+            self.enqueue_anim('remove', self.hover_target)
         if self.hover_target is None and not self.graph.hull_contains(*self.mouse_pos):
-            print("Add vertex at", self.mouse_pos)
-            try:
-                a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
-                self.animation_queue += [('flip', e)
-                                         for e in self.graph.get_cross_edges(a, b)]
-            except ValueError:
-                pass
-            self.animation_queue.append(('add', self.mouse_pos))
+            self.enqueue_anim('add', self.mouse_pos)
         self.update_nearest_thing(x, y)
+
+    def on_file_drop(self, x, y, paths):
+        for path in paths:
+            with open(path) as f:
+                self.replay_lines += list(f)
 
     def update_nearest_thing(self, x=None, y=None):
         if x is not None and y is not None:
@@ -289,9 +280,35 @@ class VisualizationWindow(pyglet.window.Window):
         return (('flip', (v1, v2)) == next_queued
                 or ('flip', (v2, v1)) == next_queued)
 
+    def enqueue_anim(self, action, loc, log=True):
+        if action == 'add':
+            try:
+                a, b = self.graph.find_convex_nbrs(Vertex(*self.mouse_pos))
+                for e in self.graph.get_cross_edges(a, b):
+                    self.enqueue_anim('flip', e, log=False)
+            except ValueError:
+                pass
+            if log:
+                print("Add vertex at", loc)
+        elif action == 'remove':
+            v = loc
+            for n in v.nbrs:
+                if self.graph.can_flip(v, n):
+                    self.enqueue_anim('flip', (v, n), log=False)
+            if log:
+                print("Remove vertex at", loc)
+        elif action == 'flip':
+            if log:
+                print("Flip edge between", loc[0], "and", loc[1])
+        self.animation_queue.append((action, loc))
+
     def step_animation(self, dt):
         if not self.animation_queue:
-            return
+            if self.replay_lines:
+                self.replay_line(self.replay_lines.pop(0))
+            if not self.animation_queue:
+                return
+
         action, loc = self.animation_queue[0]
         if action == 'flip':
             self.animation_progress += (self.animation_multiplier * dt
@@ -309,6 +326,25 @@ class VisualizationWindow(pyglet.window.Window):
             self.graph.remove_vertex(loc)
             self.animation_queue.pop(0)
             self.update_nearest_thing()
+
+    def replay_line(self, line):
+        line = line.lower()
+        coords = [float(x) for x in re.findall(r'[\d\.]+', line)]
+
+        if line.startswith('add'):
+            # Add vertex
+            self.enqueue_anim('add', np.array(coords))
+        elif line.startswith('remove'):
+            # Remove vertex
+            self.enqueue_anim('remove', self.find_vertex(coords))
+        elif line.startswith('flip'):
+            # Flip edge
+            edge = (self.find_vertex(coords[:2]),
+                    self.find_vertex(coords[2:]))
+            self.enqueue_anim('flip', edge)
+
+    def find_vertex(self, loc):
+        return [v for v in self.graph.vertices if (v.loc == np.array(loc)).all()][0]
 
 
 def flatten(it):
