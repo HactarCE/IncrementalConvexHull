@@ -378,7 +378,14 @@ class Vertex:
         self.nbrs: List[Vertex] = []
 
     def add_neighbor(self, v: Vertex):
-        """Add another vertex as a neighbor to this one."""
+        """Add another vertex as a neighbor to this one.
+
+        Params:
+            v (Vertex): Adds the vertex to the list of neighbors in the current vertex
+
+        Returns:
+            None
+        """
         size = len(self.nbrs)
 
         # List has less than 2 elements
@@ -417,11 +424,18 @@ class Vertex:
     def remove_neighbor(self, v: Vertex):
         """Remove another vertex as a neighbor of this one.
         This does NOT remove this vertex as a neighbor of the other one.
+
+        Params:
+            v (Vertex): Vertex to be removed from list of neighbors
+
+        Returns:
+            None
         """
         self.nbrs.remove(v)
 
     def get_next_nbr(self, v) -> Vertex:
-        """Returns the next neighboring vertex in counterclockwise order."""
+        """Returns the next neighboring vertex in counterclockwise order.
+        """
         idx = self.nbrs.index(v)
         if idx == len(self.nbrs) - 1:
             return self.nbrs[0]
