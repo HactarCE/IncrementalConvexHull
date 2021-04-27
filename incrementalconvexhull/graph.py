@@ -26,8 +26,8 @@ class Graph:
         due to the addition of z are removed.
 
         Params:
-            x: x coordinate of vertex
-            y: y coordinate of vertex
+            x (flaot): x coordinate of vertex
+            y (float): y coordinate of vertex
 
         Returns:
             None
@@ -70,8 +70,8 @@ class Graph:
         vertices of the graph.
 
         Params:
-            x: position x coordinate
-            y: position y coordinate
+            x (float): position x coordinate
+            y (float): position y coordinate
 
         Returns:
             True if point is contained within the hull.
@@ -88,6 +88,11 @@ class Graph:
     def __len__(self) -> int:
         """Return the number of vertices in the graph.
 
+        Params:
+            None
+
+        Returns:
+            Number of verticies in the graph (int)
         """
         return len(self.vertices)
 
@@ -123,16 +128,39 @@ class Graph:
         return range(start, stop, step)
 
     def index(self, v: Vertex):
-        """Return the index of the vertex"""
+        """Return the index of the vertex
+
+        Params:
+            v (Vertex): Vertex to index
+
+        Returns:
+            Index of vertex in graph vertex list (int)
+        """
         return self.vertices.index(v)
 
     def add_edge(self, v1: Vertex, v2: Vertex):
-        """Add an edge between two vertices in the graph."""
+        """Add an edge between two vertices in the graph.
+
+        Params:
+            v1 (Vertex): Vertex at one endpoint of the graph
+
+            v2 (Vertex): Vertex at opposite end of edge
+
+        Returns:
+            None
+        """
         v1.add_neighbor(v2)
         v2.add_neighbor(v1)
 
     def edges(self):
-        """Return a generator over all edges in the graph."""
+        """Return a generator over all edges in the graph.
+
+        Params:
+            None
+
+        Returns:
+            Generator of all edges in the graph represented as (current vertex (Vertex), neighbors list (List)
+        """
         visited = set()
         for v in self.vertices:
             visited.add(v)
@@ -141,7 +169,8 @@ class Graph:
                     yield (v, nbr)
 
     def can_flip(self, v1: Vertex, v2: Vertex):
-        """Returns whether an edge in the graph can be flipped. See flip_edge()."""
+        """Returns whether an edge in the graph can be flipped. See flip_edge().
+        """
         try:
             self.check_can_flip(v1, v2)
             return True
