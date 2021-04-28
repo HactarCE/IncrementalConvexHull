@@ -14,7 +14,7 @@
     <script src="_static/language_data.js"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Welcome to Incremental Convex Hull’s documentation!" href="index.html" />
+    <link rel="prev" title="Algorithm Description" href="algorithm.html" />
    
   <link rel="stylesheet" href="_static/custom.css" type="text/css" />
   
@@ -44,6 +44,14 @@ stored using an adjacency list on each vertex.</p>
 <dt id="incrementalconvexhull.graph.Graph.add_edge">
 <code class="sig-name descname">add_edge</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.add_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add an edge between two vertices in the graph.</p>
+<dl>
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex at one endpoint of the graph</p>
+<p>v2 (Vertex): Vertex at opposite end of edge</p>
+</dd>
+<dt>Returns:</dt><dd><p>None
+Raise ValueError if a duplicate edge is being added to graph</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -54,25 +62,80 @@ stored using an adjacency list on each vertex.</p>
 If the point is already on the interior of the convex hull, no action is taken.
 Similarly, any vertices currently on the hull that become interior vertices
 due to the addition of z are removed.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>x (flaot): x coordinate of vertex
+y (float): y coordinate of vertex</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.can_flip">
+<code class="sig-name descname">can_flip</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.can_flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns whether an edge in the graph can be flipped. See flip_edge().</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex at one end of the edge to flip
+v2 (Vertex): Vertex at the other end of the edge to flip</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if an edge can be flipped between the 2 verticies
+False if the edge cannot be flipped between the 2 veritices</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.check_can_flip">
+<code class="sig-name descname">check_can_flip</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.check_can_flip" title="Permalink to this definition">¶</a></dt>
+<dd><p>Returns a ValueError if an edge in the graph cannot be flipped. See flip_edge().</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex at one end of the edge to flip
+v2 (Vertex): Vertex at the other end of the edge to flip</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: The edge cannot be flipped</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.edges">
 <code class="sig-name descname">edges</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.edges" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a generator over all edges in the graph.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>None</p>
+</dd>
+<dt>Returns:</dt><dd><p>Generator of all edges in the graph represented as (current vertex (Vertex), neighbors list (List)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.find_convex_nbrs">
 <code class="sig-name descname">find_convex_nbrs</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.find_convex_nbrs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Find neighbors of the newly inserted point in the existing graph</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v (Vertex): Vertex to be inserted into the graph</p>
+</dd>
+<dt>Returns:</dt><dd><p>None
+Raise ValueError if there are less than 2 points in the graph</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.flip_between">
-<code class="sig-name descname">flip_between</code><span class="sig-paren">(</span><em class="sig-param">ai</em>, <em class="sig-param">bi</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_between" title="Permalink to this definition">¶</a></dt>
-<dd><p>Transform the given graph’s triangulation such that an edge between a and b exists.
-ai and bi are the indices of the vertices in graph g to connect.</p>
+<code class="sig-name descname">flip_between</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.flip_between" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transform the given graph’s triangulation such that an edge between a and b exists.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>a (Vertex):
+b (Vertex):</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -88,9 +151,32 @@ following reasons:</p>
 <li><p>Either vertex is not in the graph.</p></li>
 <li><p>The edge is not in the graph.</p></li>
 <li><p>The edge is on the convex hull of the graph.</p></li>
-<li><p>The quadrilateral formed by the triangles on either side of the edge
-is concave.</p></li>
 </ul>
+<p>Note that the quadrilateral formed by the triangles on either side of
+the edge is never concave because the vertices of the graph form a
+convex polygon.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex at one end of the edge to flip
+v2 (Vertex): Vertex at the other end of the edge to flip</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+<dt>Raises:</dt><dd><p>ValueError: The edge cannot be flipped</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="incrementalconvexhull.graph.Graph.get_cross_edges">
+<code class="sig-name descname">get_cross_edges</code><span class="sig-paren">(</span><em class="sig-param">a</em>, <em class="sig-param">b</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.get_cross_edges" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the edges in the graph that cross the line through the specified vertices.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>a (Vertex):
+b (Vertex):</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -98,24 +184,51 @@ is concave.</p></li>
 <code class="sig-name descname">hull_contains</code><span class="sig-paren">(</span><em class="sig-param">x</em>, <em class="sig-param">y</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.hull_contains" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return whether an XY position is inside the convex hull of the
 vertices of the graph.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>x (float): position x coordinate
+y (float): position y coordinate</p>
+</dd>
+<dt>Returns:</dt><dd><p>True if point is contained within the hull.
+False if the point is on the convex hull boundary or outside of the hull.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.index">
 <code class="sig-name descname">index</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.index" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the index of the vertex</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v (Vertex): Vertex to index</p>
+</dd>
+<dt>Returns:</dt><dd><p>Index of vertex in graph vertex list (int)</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.remove_edge">
 <code class="sig-name descname">remove_edge</code><span class="sig-paren">(</span><em class="sig-param">v1</em>, <em class="sig-param">v2</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_edge" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove the edge between two vertictes from the graph.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex at the end of edge to be removed
+v2 (Vertex): Vertex at the opposing end of the edge to be removed</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Graph.remove_vertex">
 <code class="sig-name descname">remove_vertex</code><span class="sig-paren">(</span><em class="sig-param">v1</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.remove_vertex" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a vertex and all its edges from the graph.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v1 (Vertex): Vertex to be removed from the graph</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -123,6 +236,12 @@ vertices of the graph.</p>
 <code class="sig-name descname">vertex_pairs</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Graph.vertex_pairs" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a generator over all pairs of adjacent points on the convex
 hull.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>None</p>
+</dd>
+<dt>Returns:</dt><dd><p>Generator of all pairs of adjacent points in the form (Vertex, Vertex)</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -138,12 +257,24 @@ however the starting index is arbitrary.</p>
 <dt id="incrementalconvexhull.graph.Vertex.add_neighbor">
 <code class="sig-name descname">add_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.add_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add another vertex as a neighbor to this one.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v (Vertex): Adds the vertex to the list of neighbors in the current vertex</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
 <dt id="incrementalconvexhull.graph.Vertex.get_next_nbr">
 <code class="sig-name descname">get_next_nbr</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.get_next_nbr" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns the next neighboring vertex in counterclockwise order.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v (Vertex): vertex to find next neighbor in ccw order</p>
+</dd>
+<dt>Returns:</dt><dd><p>neighboring vertex in CCW order</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="method">
@@ -157,6 +288,12 @@ however the starting index is arbitrary.</p>
 <code class="sig-name descname">remove_neighbor</code><span class="sig-paren">(</span><em class="sig-param">v</em><span class="sig-paren">)</span><a class="headerlink" href="#incrementalconvexhull.graph.Vertex.remove_neighbor" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove another vertex as a neighbor of this one.
 This does NOT remove this vertex as a neighbor of the other one.</p>
+<dl class="simple">
+<dt>Params:</dt><dd><p>v (Vertex): Vertex to be removed from list of neighbors</p>
+</dd>
+<dt>Returns:</dt><dd><p>None</p>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -182,6 +319,7 @@ This does NOT remove this vertex as a neighbor of the other one.</p>
 <h3>Navigation</h3>
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="algorithm.html">Algorithm Description</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API Documentation</a></li>
 </ul>
 
@@ -189,7 +327,7 @@ This does NOT remove this vertex as a neighbor of the other one.</p>
 <h3>Related Topics</h3>
 <ul>
   <li><a href="index.html">Documentation overview</a><ul>
-      <li>Previous: <a href="index.html" title="previous chapter">Welcome to Incremental Convex Hull’s documentation!</a></li>
+      <li>Previous: <a href="algorithm.html" title="previous chapter">Algorithm Description</a></li>
   </ul></li>
 </ul>
 </div>
