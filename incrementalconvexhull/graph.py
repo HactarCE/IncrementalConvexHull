@@ -441,6 +441,12 @@ class Vertex:
 
     def get_next_nbr(self, v) -> Vertex:
         """Returns the next neighboring vertex in counterclockwise order.
+
+        Params:
+            v (Vertex): vertex to find next neighbor in ccw order
+
+        Returns:
+            neighboring vertex in CCW order
         """
         idx = self.nbrs.index(v)
         if idx == len(self.nbrs) - 1:
