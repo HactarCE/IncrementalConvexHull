@@ -32,12 +32,12 @@ This interactive visualization tool will plot the points of a _convex polygon_ w
 ### Convex Polygons
 The formal definition of convex polygon is a shape in which no interior angle is greater than 180 degrees. The simplest form of a convex polygon is a triangle. You can think of this visually as a shape with no "dents" in it, or edges that protrude inside the main cavity of the shape.
 
-<img src="https://github.com/HactarCE/IncrementalConvexHull/blob/main/docs/img/convex-concave-polygons.jpg" width="350" height=150>
+<img src="https://raw.githubusercontent.com/HactarCE/IncrementalConvexHull/main/docs/img/convex-concave-polygons.jpg" width="350" height=150>
 
 ### Triangulations
 Every convex polygon can be broken down into smaller triangles, the simplest form of a convex polygon. This process of dividing a polygon into triangles is called triangulation. There are multiple ways the triangulate a shape. Our visualization supports multiple triangulations. Upon clicking an _internal_ edge in the polygon, the edge will then flip, producing another valid triangulation.
 
-<img src="https://github.com/HactarCE/IncrementalConvexHull/blob/main/docs/img/triangulation.png" width="500" height=150>
+<img src="https://raw.githubusercontent.com/HactarCE/IncrementalConvexHull/main/docs/img/triangulation.png" width="500" height=150>
 
 ### Convex Hulls
 A convex hull is the outtermost boundary in a set of points that encompasses all other points. This visualization tool only supports convex polygons with no colinear points. The following are properties of convex polygons: 
@@ -47,6 +47,4 @@ The following are properties of convex hulls:
 - A tangent line can be drawn for each point on the convex hull such that all other points are on one side of the tangent line
 
 
-<img src="https://github.com/HactarCE/IncrementalConvexHull/blob/main/docs/img/convex_hull.png" width="200" height=150>
-
-
+<img src="https://raw.githubusercontent.com/HactarCE/IncrementalConvexHull/main/docs/img/convex_hull.png" width="200" height=150>
