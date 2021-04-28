@@ -1,4 +1,5 @@
 from collections.abc import Iterable
+import base64
 import math
 import numpy as np
 import pyglet
@@ -22,6 +23,7 @@ HOVERED_EDGE_COLOR = (127, 127, 127)
 FLIPPABLE_EDGE_COLOR = (63, 63, 255)
 GHOST_EDGE_COLOR = (47, 47, 47)
 CROSS_EDGE_COLOR = (127, 47, 47)
+WARNING_TEXT_COLOR = (255, 0, 127, 255)
 
 VERT_RADIUS = 3.0
 HOVERED_VERT_RADIUS = 4.0
@@ -53,6 +55,20 @@ class VisualizationWindow(pyglet.window.Window):
             anchor_x='left',
             anchor_y='top',
         )
+        self.colinear_warning_label = pyglet.text.Label(
+            base64.b64decode("Q29saW5lYXIgcG9pbnRzPwoKTk9UIEJZIFRIRSB"
+                             + "IQUlSIE9GIE1ZIENISU5OWSBDSElOIENISU4=").decode('utf-8'),
+            x=self.width // 2,
+            y=self.height // 2,
+            multiline=True,
+            width=self.width,
+            align='center',
+            anchor_x='center',
+            anchor_y='center',
+            bold=True,
+            font_size=20,
+            color=WARNING_TEXT_COLOR,
+        )
 
         # Visualization state
         self.graph = Graph()
@@ -64,6 +80,7 @@ class VisualizationWindow(pyglet.window.Window):
         self.animation_progress = 0.0
         self.animation_queue = []
         self.replay_lines = []
+        self.warning_text_countdown = 0.0
 
         pyglet.clock.schedule_interval(self.step_animation, 1/FPS)
 
@@ -136,9 +153,11 @@ class VisualizationWindow(pyglet.window.Window):
     def on_draw(self):
         self.clear()
 
-        # Update text
+        # Update and draw text
         self.update_instructions_text()
         self.instructions_label.draw()
+        if self.warning_text_countdown > 0.0:
+            self.colinear_warning_label.draw()
 
         # Initialize draw lists
         self.vertex_coords = []
@@ -305,6 +324,9 @@ class VisualizationWindow(pyglet.window.Window):
         self.animation_queue.append((action, loc))
 
     def step_animation(self, dt):
+        if self.warning_text_countdown > 0.0:
+            self.warning_text_countdown -= dt
+
         if not self.animation_queue:
             if self.replay_lines:
                 self.replay_line(self.replay_lines.pop(0))
@@ -324,7 +346,9 @@ class VisualizationWindow(pyglet.window.Window):
             try:
                 self.graph.add_vertex(*loc)
             except ValueError as e:
+                # failed to add vertices (probably because colinear)
                 print("Failed to add vertex:", e)
+                self.warning_text_countdown = 2.0
             self.animation_queue.pop(0)
             self.update_nearest_thing()
         elif action == 'remove':
