@@ -1,8 +1,9 @@
 # IncrementalConvexHull
-Incremental convex hull visualization for CSC 591
+Incremental Convex Hull Visualization for CSC 591, Spring 2021
 
 ## Planning and Starting Resources
-- Helpful [visualization tool](https://www.cs.usfca.edu/~galles/visualization/Algorithms.html) for tree rotations and data structures review
+- View our official documentation
+- [In-depth walkthrough](https://github.com/HactarCE/IncrementalConvexHull/blob/main/WALKTHROUGH.md) outlining how to use the GUI along with some interesting examples
 
 ## Development
 
