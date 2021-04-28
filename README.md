@@ -2,7 +2,7 @@
 Incremental Convex Hull Visualization for CSC 591, Spring 2021
 
 ## Planning and Starting Resources
-- View our official documentation
+- Read our [documentation](https://hactarce.github.io/IncrementalConvexHull/api.html)
 - [In-depth walkthrough](https://github.com/HactarCE/IncrementalConvexHull/blob/main/WALKTHROUGH.md) outlining how to use the GUI along with some interesting examples
 
 ## Development
