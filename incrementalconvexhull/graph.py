@@ -178,6 +178,14 @@ class Graph:
 
     def can_flip(self, v1: Vertex, v2: Vertex):
         """Returns whether an edge in the graph can be flipped. See flip_edge().
+
+        Params:
+            v1 (Vertex): Vertex at one end of the edge to flip
+            v2 (Vertex): Vertex at the other end of the edge to flip
+
+        Returns:
+            True if an edge can be flipped between the 2 verticies
+            False if the edge cannot be flipped between the 2 veritices
         """
         try:
             self.check_can_flip(v1, v2)
@@ -189,12 +197,14 @@ class Graph:
         """Returns a ValueError if an edge in the graph cannot be flipped. See flip_edge().
 
         Params:
-            v1 (Vertex):
-            v2 (Vertex):
+            v1 (Vertex): Vertex at one end of the edge to flip
+            v2 (Vertex): Vertex at the other end of the edge to flip
 
         Returns:
-            True if an edge can be flipped between the 2 verticies
-            False if the edge cannot be flipped between the 2 veritices
+            None
+
+        Raises:
+            ValueError: The edge cannot be flipped
         """
         try:
             i1 = self.vertices.index(v1)
@@ -230,11 +240,14 @@ class Graph:
         convex polygon.
 
         Params:
-            v1 (Vertex):
-            v2 (Vertex):
+            v1 (Vertex): Vertex at one end of the edge to flip
+            v2 (Vertex): Vertex at the other end of the edge to flip
 
         Returns:
             None
+
+        Raises:
+            ValueError: The edge cannot be flipped
         """
         self.check_can_flip(v1, v2)
         n1 = v1.get_next_nbr(v2)
