@@ -48,9 +48,6 @@ class PolygonTest(unittest.TestCase):
         g.add_vertex(3, -1)
         self.assertEqual(4, len(g.vertices))
 
-    def test_remove_vertex(self):
-        pass
-
     def test_find_convex_nbrs(self):
         # define points
         a = graph.Vertex(-5, 0)
